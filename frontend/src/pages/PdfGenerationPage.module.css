@@ -1,0 +1,1140 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 1rem;
+  background: #f1f5f9;
+  min-height: 100vh;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  align-items: center;
+}
+
+.tabActions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-left: auto;
+}
+
+.previewButton,
+.generateButton {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.previewButton {
+  background: #64748b;
+  color: #fff;
+}
+
+.previewButton:hover:not(:disabled) {
+  background: #475569;
+}
+
+.previewButton:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+}
+
+.generateButton {
+  background: #2563eb;
+  color: #fff;
+}
+
+.generateButton:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.generateButton:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2rem;
+  color: #0f172a;
+}
+
+.header p {
+  margin: 0.25rem 0 0;
+  color: #475569;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: #f9fafb;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.section h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #1f2937;
+  font-weight: 700;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.section label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.section label span {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.section input,
+.section textarea,
+.section select {
+  padding: 0.625rem 0.875rem;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.section input:focus,
+.section textarea:focus,
+.section select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.section textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.itemRow {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr auto;
+  gap: 1rem;
+  align-items: end;
+  padding: 1rem;
+  background: #fff;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  margin-bottom: 1rem;
+}
+
+.itemRow label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.itemRow label span {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.itemRow input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.addButton {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #2563eb, #22d3ee);
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.addButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.removeButton {
+  padding: 0.5rem 1rem;
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background 0.2s ease;
+}
+
+.removeButton:hover {
+  background: #dc2626;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.actions button {
+  padding: 0.75rem 2rem;
+  background: linear-gradient(135deg, #2563eb, #22d3ee);
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.actions button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+.actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 1200px) {
+  .itemRow {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .itemRow .removeButton {
+    width: 100%;
+  }
+}
+
+/* Modern Invoice Form Styles - Document Preview */
+.modernForm {
+  display: flex !important;
+  flex-direction: column;
+  gap: 1.25rem;
+  background: #fff;
+  padding: 1.5rem 2rem;
+  border-radius: 0;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 210mm; /* A4 width */
+  min-height: 297mm; /* A4 height */
+  max-width: 210mm;
+  margin: 0 auto;
+  position: relative;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  padding-top: 0.5rem;
+}
+
+.fromToLogoSection {
+  display: grid;
+  grid-template-columns: 40% 20% 40%;
+  gap: 1.5rem;
+  align-items: start;
+  width: 100%;
+  padding: 8rem 1rem 0 1rem;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.topRightDates {
+  position: absolute;
+  top: 0;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  z-index: 10;
+}
+
+.logoColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 0;
+  margin-top: 0;
+  align-self: start;
+  padding-right: 1rem;
+  box-sizing: border-box;
+}
+
+.middleLogoArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid rgba(148, 163, 184, 0.3);
+  border-radius: 0.5rem;
+  background: #fff;
+  box-sizing: border-box;
+  align-self: start;
+  margin-top: -3.5rem;
+}
+
+.middleLogoImage {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: 0.25rem;
+  display: block;
+  padding: 0.5rem;
+}
+
+.invoiceDetailsRow {
+  display: grid;
+  grid-template-columns: 120px 1fr 180px 160px;
+  gap: 1rem;
+  align-items: end;
+  width: 100%;
+  padding-bottom: 1.5rem;
+  margin-bottom: 0;
+}
+
+.fromToContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  margin-top: 0;
+  box-sizing: border-box;
+}
+
+.compactLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.compactLabel span {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
+
+.compactLabel input,
+.compactLabel select {
+  padding: 0.75rem 0.875rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  background: #fff;
+  transition: border-color 0.2s;
+  width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
+}
+
+.compactLabel input:focus,
+.compactLabel select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+
+.infoBox {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.5rem;
+  border: 2px solid rgba(148, 163, 184, 0.3);
+  border-radius: 0.5rem;
+  background: #fff;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.infoBoxHeader {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.05rem;
+}
+
+.infoBoxInput {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  background: #fff;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.infoBoxInput:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.infoBoxInput::placeholder {
+  color: #94a3b8;
+}
+
+.infoBoxContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin-top: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #475569;
+  line-height: 1.3;
+}
+
+.infoBoxLine {
+  margin: 0;
+  padding: 0;
+  font-weight: 600;
+  font-size: 0.7rem;
+  line-height: 1.3;
+}
+
+.infoBoxSelect {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  background: #fff;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+  cursor: pointer;
+}
+
+.infoBoxSelect:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.logoArea {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0;
+  width: 100%;
+  padding: 0.5rem;
+  border: 2px solid rgba(148, 163, 184, 0.3);
+  border-radius: 0.5rem;
+  background: #fff;
+  box-sizing: border-box;
+  align-self: start;
+  margin-top: 0;
+}
+
+.balanceDueUnderLogo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding-top: 1.5rem;
+  margin-top: 0.5rem;
+  gap: 0.5rem;
+}
+
+.balanceDueUnderLogo .balanceDueLabel {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dateFields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  width: 100%;
+  margin-bottom: 1.5rem;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.dateField {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.dateLabel {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 70px;
+  flex-shrink: 0;
+}
+
+.dateInput {
+  padding: 0.3rem 0.4rem;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-family: inherit;
+  background: #fff;
+  color: #1e293b;
+  transition: border-color 0.2s;
+  width: 120px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.dateInput:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.balanceDueUnderLogo .balanceDueValue {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.logoImage {
+  width: calc(100% - 1rem) !important;
+  max-width: calc(100% - 1rem) !important;
+  height: auto !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  object-position: top center !important;
+  border-radius: 0.25rem;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  padding: 0.5rem;
+}
+
+.removeLogoButton {
+  color: #dc2626;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  text-decoration: underline;
+  padding: 0;
+  font-weight: 500;
+}
+
+.removeLogoButton:hover {
+  color: #b91c1c;
+}
+
+.hiddenFileInput {
+  display: none;
+}
+
+.uploadLogoLabel {
+  padding: 2rem;
+  border: 2px dashed rgba(148, 163, 184, 0.6);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  text-align: center;
+  color: #475569;
+  font-size: 0.875rem;
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 150px;
+  padding-bottom: 1.5rem;
+}
+
+.uploadLogoLabel:hover {
+  border-color: #2563eb;
+}
+
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 1rem;
+  width: 100%;
+  padding: 0 1rem;
+  box-sizing: border-box;
+  padding-top: 1rem;
+  align-items: start;
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
+  align-items: start;
+  margin-top: 0;
+}
+
+.itemsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+  box-sizing: border-box;
+  grid-column: 1 / -1;
+}
+
+.itemsHeader {
+  background: #475569;
+  color: #fff;
+  border-radius: 0;
+}
+
+.itemsHeaderRow {
+  display: grid;
+  grid-template-columns: 2fr 0.67fr 0.67fr 0.67fr;
+  gap: 1rem;
+  padding: 0.5rem 2rem 0.5rem 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  align-items: center;
+}
+
+.headerCell {
+  font-weight: 600;
+  font-size: 0.8125rem;
+  padding: 0.625rem 0.875rem;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+}
+
+.headerCell:last-child {
+  padding-left: 1.5rem;
+}
+
+.itemsBody {
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-top: none;
+  background: #fff;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.modernForm .itemRow {
+  display: grid;
+  grid-template-columns: 2fr 0.67fr 0.67fr 0.67fr;
+  gap: 1rem;
+  align-items: start;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+  background: #fff;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.itemDescription,
+.itemPrice,
+.itemQuantity,
+.itemAmountWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.itemAmountWrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: flex-start;
+}
+
+.modernForm .itemRow:last-child {
+  border-bottom: none;
+}
+
+.modernForm .itemRow:hover {
+  background: #f8fafc;
+}
+
+.itemInput {
+  padding: 0.625rem 0.875rem;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  background: #fff;
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.itemInput:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.priceInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.priceInputWrapper .currencySymbol {
+  position: absolute;
+  left: 0.75rem;
+  color: #64748b;
+  font-size: 0.875rem;
+  font-weight: 500;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.priceInputWrapper .itemInput {
+  padding-left: 1.5rem;
+}
+
+.itemAmount {
+  font-weight: 600;
+  color: #1f2937;
+  text-align: left;
+  font-size: 0.875rem;
+  padding: 0.625rem 0.875rem 0.625rem 2rem;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex: 1;
+  min-height: 2.5rem;
+}
+
+.removeItemButton {
+  background: none;
+  border: none;
+  color: #dc2626;
+  cursor: pointer;
+  font-size: 1.25rem;
+  padding: 0.25rem 0.5rem;
+  line-height: 1;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+
+.removeItemButton:hover {
+  color: #b91c1c;
+}
+
+.removeItemButton {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.removeItemButton:hover {
+  color: #dc2626;
+}
+
+.itemsFooter {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.newItemButton {
+  padding: 0.625rem 1.25rem;
+  background: linear-gradient(135deg, #2563eb, #22d3ee);
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.newItemButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.additionalDetailsButton {
+  padding: 0.625rem 1.25rem;
+  background: none;
+  color: #2563eb;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.875rem;
+  text-decoration: underline;
+}
+
+.notesAndTaxRow {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
+  grid-column: 1 / -1;
+  align-items: start;
+}
+
+.notesSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 150px;
+}
+
+.notesSection label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.notesSection label span {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.notesSection textarea {
+  padding: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 100px;
+  max-height: 300px;
+  background: #fff;
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.notesSection textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.financialSummary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
+  background: #f8fafc;
+  border-radius: 0.375rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  min-height: auto;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.25rem 0;
+  flex-wrap: wrap;
+}
+
+.summaryLabel {
+  font-weight: 600;
+  color: #475569;
+  font-size: 0.8125rem;
+}
+
+.summaryValue {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 0.875rem;
+}
+
+.taxDiscountRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.25rem 0;
+  width: 100%;
+}
+
+.taxDiscountButtons {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.taxDiscountToggle {
+  padding: 0.375rem 0.625rem;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: #f1f5f9;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #64748b;
+  transition: all 0.2s;
+  min-width: 36px;
+}
+
+.taxDiscountToggle:hover {
+  background: #e2e8f0;
+}
+
+.taxDiscountToggle.active {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+
+.taxDiscountInput {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.taxDiscountInput {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  width: auto;
+  position: relative;
+  justify-content: flex-start;
+  margin-left: auto;
+}
+
+.taxDiscountInput input {
+  width: 50px;
+  min-width: 45px;
+  padding: 0.5rem 2.5rem 0.5rem 0.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  background: #f8fafc;
+  color: #1e293b;
+  -webkit-appearance: textfield;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.taxDiscountInput input::-webkit-inner-spin-button {
+  -webkit-appearance: inner-spin-button;
+  opacity: 1;
+  cursor: pointer;
+  height: 100%;
+  width: 16px;
+  position: absolute;
+  right: 1.5rem;
+  top: 0;
+}
+
+.taxDiscountInput input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.taxDiscountSymbol {
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 500;
+  min-width: 20px;
+  position: absolute;
+  right: 0.5rem;
+  pointer-events: none;
+  z-index: 1;
+  padding-left: 0.25rem;
+}
+
+.removeTaxDiscountButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  color: #475569;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+
+.removeTaxDiscountButton:hover {
+  color: #1e293b;
+}
+
+.removeShippingButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.25rem;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.removeTaxDiscountButton:hover,
+.removeShippingButton:hover {
+  opacity: 1;
+}
+
+.addTaxButton,
+.addDiscountButton,
+.addShippingButton {
+  padding: 0.5rem 1rem;
+  background: none;
+  color: #2563eb;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.875rem;
+  text-align: left;
+  text-decoration: underline;
+}
+
+.shippingInput {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.shippingInput input {
+  width: 100px;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.balanceDueRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.75rem;
+  border-top: 2px solid rgba(148, 163, 184, 0.25);
+  margin-top: 0.5rem;
+}
+
+.balanceDueLabel {
+  font-weight: 700;
+  color: #1f2937;
+  font-size: 0.9375rem;
+}
+
+.balanceDueValue {
+  font-weight: 700;
+  color: #1f2937;
+  font-size: 1.125rem;
+}
+
+.generateButton {
+  padding: 0.75rem 2rem;
+  background: linear-gradient(135deg, #2563eb, #22d3ee);
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  align-self: flex-end;
+}
+
+.generateButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+.generateButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

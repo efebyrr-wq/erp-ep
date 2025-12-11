@@ -1,0 +1,499 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  position: relative;
+}
+
+.settingsButton {
+  border: none;
+  background: linear-gradient(135deg, #2563eb, #22d3ee);
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
+}
+
+.settingsButton:hover {
+  background: linear-gradient(135deg, #1d4ed8, #06b6d4);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+}
+
+.cardsContainer {
+  display: flex;
+  gap: 1.5rem;
+  width: 100%;
+  flex-wrap: nowrap;
+}
+
+.taxCard {
+  flex: 0 0 25%;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.95));
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 1.25rem;
+  padding: 2rem;
+  box-shadow:
+    0 20px 40px rgba(15, 23, 42, 0.08),
+    0 8px 16px rgba(15, 23, 42, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.taxCard:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 24px 48px rgba(15, 23, 42, 0.12),
+    0 12px 24px rgba(15, 23, 42, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.taxCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.taxCardTitle {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.taxCardActions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.payButton {
+  border: none;
+  background: linear-gradient(135deg, #10b981, #34d399);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.payButton:hover {
+  background: linear-gradient(135deg, #059669, #10b981);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+}
+
+.expandButton {
+  border: none;
+  background: transparent;
+  color: #475569;
+  padding: 0.4rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.expandButton:hover {
+  background: rgba(148, 163, 184, 0.15);
+  color: #0f172a;
+}
+
+.expandedIcon {
+  transform: rotate(180deg);
+}
+
+.taxCardAmount {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2563eb;
+  margin: 0.5rem 0;
+}
+
+.taxCardDescription {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.paidInfo {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.paidLabel {
+  color: #64748b;
+}
+
+.paidAmount {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.paymentsList {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.paymentItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.paymentRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.paymentDate {
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.paymentAmount {
+  font-weight: 600;
+  color: #10b981;
+}
+
+.paymentAccount {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.75rem;
+  color: rgba(15, 23, 42, 0.7);
+}
+
+.accountLabel {
+  font-weight: 500;
+}
+
+.accountValue {
+  color: #2563eb;
+  font-weight: 500;
+}
+
+.paymentNotes {
+  font-size: 0.75rem;
+  color: rgba(15, 23, 42, 0.6);
+  font-style: italic;
+}
+
+.noPayments {
+  text-align: center;
+  color: rgba(15, 23, 42, 0.5);
+  font-size: 0.85rem;
+  padding: 1rem;
+}
+
+.paymentForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.paymentForm label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.paymentForm label span {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.paymentForm input,
+.paymentForm select,
+.paymentForm textarea {
+  padding: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: border-color 0.2s ease;
+}
+
+.paymentForm input:focus,
+.paymentForm select:focus,
+.paymentForm textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.formFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.formFooter button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.formFooter button[type="button"] {
+  background: rgba(148, 163, 184, 0.1);
+  color: #475569;
+}
+
+.formFooter button[type="button"]:hover {
+  background: rgba(148, 163, 184, 0.2);
+}
+
+.formFooter button[type="submit"] {
+  background: linear-gradient(135deg, #2563eb, #22d3ee);
+  color: white;
+}
+
+.formFooter button[type="submit"]:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1d4ed8, #06b6d4);
+  transform: translateY(-1px);
+}
+
+.formFooter button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.settingsForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.settingsForm label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.settingsForm label span {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.settingsForm input {
+  padding: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: border-color 0.2s ease;
+}
+
+.settingsForm input:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.settingsForm small {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: -0.25rem;
+}
+
+.incomeExpensesSection {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 2px solid rgba(148, 163, 184, 0.2);
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+}
+
+.incomeExpensesGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.incomeColumn,
+.expensesColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.columnTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(148, 163, 184, 0.2);
+}
+
+.incomeColumn .columnTitle {
+  color: #10b981;
+  border-bottom-color: rgba(16, 185, 129, 0.3);
+}
+
+.expensesColumn .columnTitle {
+  color: #ef4444;
+  border-bottom-color: rgba(239, 68, 68, 0.3);
+}
+
+.itemsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.itemsList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.itemsList::-webkit-scrollbar-track {
+  background: rgba(148, 163, 184, 0.1);
+  border-radius: 3px;
+}
+
+.itemsList::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 3px;
+}
+
+.itemsList::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
+.itemCard {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.itemCard:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(148, 163, 184, 0.4);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+}
+
+.itemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.itemName {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.95rem;
+  flex: 1;
+}
+
+.itemAmount {
+  font-weight: 700;
+  color: #2563eb;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.itemDate {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.itemType {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-style: italic;
+  padding-top: 0.25rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.noItems {
+  text-align: center;
+  color: rgba(15, 23, 42, 0.5);
+  font-size: 0.9rem;
+  padding: 2rem;
+  background: rgba(148, 163, 184, 0.05);
+  border-radius: 0.5rem;
+  border: 1px dashed rgba(148, 163, 184, 0.3);
+}
+
+@media (max-width: 1024px) {
+  .incomeExpensesGrid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .cardsContainer {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .taxCard {
+    flex: 0 0 calc((100% - 2rem) / 2);
+  }
+}
+
+@media (max-width: 480px) {
+  .taxCard {
+    flex: 0 0 100%;
+  }
+}
+

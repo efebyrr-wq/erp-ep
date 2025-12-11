@@ -1,0 +1,420 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.insertButton {
+  border: none;
+  background: linear-gradient(135deg, #2563eb, #22d3ee);
+  color: #fff;
+  padding: 0.65rem 1.25rem;
+  border-radius: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.actions {
+  display: inline-flex;
+  gap: 0.5rem;
+}
+
+.actions button {
+  border: none;
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.65rem;
+  cursor: pointer;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: calc(90vh - 120px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form label {
+  display: grid;
+  gap: 0.35rem;
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.form input,
+.form select {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  padding: 0.4rem 0.6rem;
+  font-family: inherit;
+  font-size: 0.875rem;
+  background: #fff;
+  color: #0f172a;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23475569' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.8rem center;
+  padding-right: 2.5rem;
+}
+
+.form select:hover {
+  border-color: rgba(37, 99, 235, 0.5);
+}
+
+.form select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.billHeader select {
+  width: 100%;
+}
+
+.readOnly {
+  background: rgba(148, 163, 184, 0.1);
+  cursor: not-allowed;
+}
+
+.billHeader {
+  display: grid;
+  grid-template-columns: 2fr 1fr auto;
+  gap: 1rem;
+  align-items: end;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  flex-shrink: 0;
+}
+
+.billLinesSection {
+  margin-top: 1rem;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.billLinesHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-shrink: 0;
+}
+
+.billLinesHeader h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #0f172a;
+}
+
+.addLineButton {
+  border: none;
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.65rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.billLine {
+  display: grid;
+  grid-template-columns: 1.8fr 1.8fr 2.5fr 1.5fr 1.5fr 1.5fr auto;
+  gap: 0.75rem;
+  align-items: end;
+  padding: 1.25rem 1.5rem;
+  background: rgba(248, 250, 252, 0.7);
+  border-radius: 0.75rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  flex-shrink: 0;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* When rental fields are shown, adjust grid to accommodate start/end dates between Details and Unit Price */
+.billLine.rental {
+  grid-template-columns: 1.8fr 1.8fr 2.2fr 1.9fr 1.9fr 1.4fr 1.4fr 1.4fr auto;
+  gap: 0.75rem;
+  max-width: 100%;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* Date inputs use the same styling as other inputs - no special styling needed */
+
+.billLine label {
+  font-size: 0.875rem;
+  min-width: 0;
+  gap: 0.4rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Ensure date labels have enough space */
+.billLine label:has(input[type="date"]) {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Ensure all labels have proper spacing */
+.billLine label span {
+  margin-bottom: 0.25rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.billLine input,
+.billLine select {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  background: #fff;
+  color: #0f172a;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: system-ui, -apple-system, sans-serif;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.billLine select {
+  min-width: 0;
+}
+
+.billLine input[type="date"] {
+  min-width: 0;
+}
+
+.billLine input[type="number"] {
+  min-width: 0;
+}
+
+.billLine input[readonly] {
+  min-width: 0;
+}
+
+.billLine input:focus,
+.billLine select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.billLine input:hover,
+.billLine select:hover {
+  border-color: rgba(37, 99, 235, 0.5);
+}
+
+/* Date inputs - Safari-specific fixes and ensure they're wide enough */
+.billLine input[type="date"] {
+  cursor: pointer;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #fff;
+  color: #0f172a;
+  position: relative;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.billLine input[type="date"]::before,
+.billLine input[type="date"]::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Ensure date input displays correctly in Safari */
+.billLine input[type="date"]::-webkit-datetime-edit {
+  padding: 0;
+  color: #0f172a;
+}
+
+.billLine input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+  padding: 0;
+}
+
+.billLine input[type="date"]::-webkit-datetime-edit-text {
+  color: #0f172a;
+  padding: 0 0.2rem;
+}
+
+.billLine input[type="date"]::-webkit-datetime-edit-month-field,
+.billLine input[type="date"]::-webkit-datetime-edit-day-field,
+.billLine input[type="date"]::-webkit-datetime-edit-year-field {
+  color: #0f172a;
+  padding: 0;
+}
+
+
+.billLine select {
+  padding-right: 2rem;
+}
+
+.removeLineButton {
+  border: none;
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.65rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1.2rem;
+  line-height: 1;
+  align-self: center;
+}
+
+.totalSection {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(37, 99, 235, 0.05);
+  border-radius: 0.75rem;
+  text-align: right;
+  font-size: 1.2rem;
+  color: #0f172a;
+  flex-shrink: 0;
+}
+
+.billLinesContainer {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+  max-height: 450px;
+  padding-right: 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.billLinesContainer::-webkit-scrollbar {
+  width: 8px;
+}
+
+.billLinesContainer::-webkit-scrollbar-track {
+  background: rgba(148, 163, 184, 0.1);
+  border-radius: 4px;
+}
+
+.billLinesContainer::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 4px;
+}
+
+.billLinesContainer::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
+.checkbox {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-weight: 600;
+  align-items: flex-start;
+}
+
+.removeButtonContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: flex-start;
+  align-self: start;
+  padding-top: 0;
+}
+
+.billLine .checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s;
+  width: 100%;
+  justify-content: center;
+}
+
+.billLine .checkbox:hover {
+  background-color: rgba(37, 99, 235, 0.05);
+}
+
+.billLine .checkbox input[type="checkbox"] {
+  width: 1.25rem;
+  height: 1.25rem;
+  min-width: 1.25rem;
+  margin: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  accent-color: #2563eb;
+  border-radius: 0.25rem;
+  border: 2px solid rgba(148, 163, 184, 0.6);
+  transition: all 0.2s;
+}
+
+.billLine .checkbox input[type="checkbox"]:checked {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+.billLine .checkbox input[type="checkbox"]:hover {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.footer button {
+  border-radius: 0.75rem;
+  border: none;
+  padding: 0.55rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.footer button:first-of-type {
+  background: rgba(148, 163, 184, 0.2);
+  color: #475569;
+}
+
+.footer button:last-of-type {
+  background: linear-gradient(135deg, #2563eb, #22d3ee);
+  color: #fff;
+}
+
+
+
+
+

@@ -1,0 +1,402 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.header button {
+  border: none;
+  background: linear-gradient(135deg, #2563eb, #22d3ee);
+  color: #fff;
+  padding: 0.65rem 1.25rem;
+  border-radius: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.actions {
+  display: inline-flex;
+  gap: 0.5rem;
+}
+
+.actions button:not(.deleteButton) {
+  border: none;
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.65rem;
+  cursor: pointer;
+}
+
+.deleteButton {
+  border: none;
+  background: rgba(248, 113, 113, 0.2);
+  color: #dc2626;
+  padding: 0.45rem;
+  border-radius: 0.65rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.deleteButton:hover:not(:disabled) {
+  background: rgba(248, 113, 113, 0.35);
+  transform: translateY(-1px);
+}
+
+.deleteButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.form {
+  display: grid;
+  gap: 1rem;
+}
+
+.form label {
+  display: grid;
+  gap: 0.35rem;
+  color: #475569;
+  font-weight: 600;
+}
+
+.form input,
+.form select {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  padding: 0.55rem 0.8rem;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.footer button {
+  border-radius: 0.75rem;
+  border: none;
+  padding: 0.55rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.footer button:first-of-type {
+  background: rgba(148, 163, 184, 0.2);
+  color: #475569;
+}
+
+.footer button:last-of-type {
+  background: linear-gradient(135deg, #2563eb, #22d3ee);
+  color: #fff;
+}
+
+.machineryLabel {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  background: rgba(37, 99, 235, 0.08);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.machineryNumber,
+.machineryCode {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.machineryNumber::before {
+  content: '🔧 ';
+  margin-right: 0.25rem;
+}
+
+.machineryCode::before {
+  content: '📋 ';
+  margin-right: 0.25rem;
+}
+
+.specs {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.specsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.editSpecsBtn {
+  border: none;
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.65rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.specActionBar {
+  display: flex;
+  gap: 8px;
+}
+
+.cancelBtn {
+  border: none;
+  background: rgba(148, 163, 184, 0.25);
+  color: #334155;
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.65rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.saveBtn {
+  border: none;
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  color: #fff;
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.65rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.specRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  background: rgba(248, 250, 252, 0.7);
+  gap: 0.75rem;
+}
+
+.specContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+  gap: 1rem;
+}
+
+.specName {
+  color: #475569;
+  font-size: 1.1rem;
+  font-weight: 600;
+  min-width: 180px;
+}
+
+.specValue {
+  color: #0f172a;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.specRow input {
+  border-radius: 0.6rem;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  padding: 0.5rem 0.7rem;
+  min-width: 220px;
+  font-size: 1.05rem;
+}
+
+.deleteSpecBtn {
+  border: none;
+  background: rgba(248, 113, 113, 0.2);
+  color: #dc2626;
+  padding: 0.5rem;
+  border-radius: 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.deleteSpecBtn:hover:not(:disabled) {
+  background: rgba(248, 113, 113, 0.35);
+  transform: translateY(-1px);
+}
+
+.deleteSpecBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.addSpecBtn {
+  border: none;
+  background: linear-gradient(135deg, #2563eb, #22d3ee);
+  color: #fff;
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.65rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.addSpecBtn:hover {
+  opacity: 0.9;
+}
+
+.addSpecForm {
+  margin-top: 0.75rem;
+  padding: 0.9rem;
+  border: 2px dashed rgba(37, 99, 235, 0.3);
+  border-radius: 0.75rem;
+  background: rgba(37, 99, 235, 0.05);
+}
+
+.addSpecForm .specRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.specInput {
+  border-radius: 0.6rem;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  padding: 0.55rem 0.8rem;
+  font-size: 1.05rem;
+}
+
+.specInput:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.addSpecActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.addSpecSubmitBtn {
+  border: none;
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  color: #fff;
+  padding: 0.55rem 1rem;
+  border-radius: 0.65rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.addSpecSubmitBtn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.addSpecSubmitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.addSpecCancelBtn {
+  border: none;
+  background: rgba(148, 163, 184, 0.25);
+  color: #334155;
+  padding: 0.55rem 1rem;
+  border-radius: 0.65rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.addSpecCancelBtn:hover:not(:disabled) {
+  background: rgba(148, 163, 184, 0.35);
+}
+
+.addSpecCancelBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.contentGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.75rem;
+  align-items: start;
+}
+
+/* Map on left, table on right */
+.mapSection {
+  order: 1;
+  min-width: 0;
+}
+
+.tableSection {
+  order: 2;
+  min-width: 0;
+  max-height: 600px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 12px 25px rgba(15, 23, 42, 0.05),
+    0 6px 12px rgba(15, 23, 42, 0.03);
+}
+
+.tableSection :global(.wrapper) {
+  overflow: visible;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+.tableSection::-webkit-scrollbar {
+  width: 8px;
+}
+
+.tableSection::-webkit-scrollbar-track {
+  background: rgba(148, 163, 184, 0.1);
+  border-radius: 4px;
+}
+
+.tableSection::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 4px;
+}
+
+.tableSection::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.6);
+}
+
+.mapSection h2 {
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+@media (max-width: 1024px) {
+  .contentGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+
+
+

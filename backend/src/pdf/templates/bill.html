@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fatura</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      color: #000;
+      padding: 20px;
+      line-height: 1.4;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #000;
+      padding-bottom: 15px;
+    }
+    .company-info {
+      flex: 1;
+    }
+    .company-info h1 {
+      font-size: 18px;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    .company-info p {
+      font-size: 11px;
+      margin: 2px 0;
+    }
+    .bill-info {
+      text-align: right;
+      flex: 1;
+    }
+    .bill-info h2 {
+      font-size: 16px;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    .bill-info p {
+      font-size: 11px;
+      margin: 2px 0;
+    }
+    .supplier-info {
+      margin-bottom: 20px;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+    }
+    .supplier-info p {
+      font-size: 11px;
+      margin: 2px 0;
+    }
+    .bill-details {
+      margin-bottom: 15px;
+    }
+    .bill-details table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .bill-details td {
+      padding: 3px 5px;
+      font-size: 11px;
+    }
+    .bill-details td:first-child {
+      font-weight: bold;
+      width: 150px;
+    }
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    .items-table th,
+    .items-table td {
+      border: 1px solid #000;
+      padding: 6px;
+      text-align: left;
+      font-size: 10px;
+    }
+    .items-table th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+      text-align: center;
+    }
+    .text-right {
+      text-align: right;
+    }
+    .text-center {
+      text-align: center;
+    }
+    .totals {
+      margin-top: 20px;
+      margin-left: auto;
+      width: 350px;
+    }
+    .totals table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .totals td {
+      padding: 6px 10px;
+      border: 1px solid #000;
+      font-size: 11px;
+    }
+    .totals td:first-child {
+      font-weight: bold;
+      background-color: #f0f0f0;
+      width: 60%;
+    }
+    .totals td:last-child {
+      text-align: right;
+    }
+    .footer {
+      margin-top: 30px;
+      padding-top: 15px;
+      border-top: 1px solid #ccc;
+      font-size: 10px;
+      color: #666;
+      text-align: center;
+    }
+    .notes {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="company-info">
+      <h1>{{from.name}}</h1>
+      {{#if from.address}}<p>{{from.address}}</p>{{/if}}
+      {{#if from.phone}}<p>Tel: {{from.phone}}</p>{{/if}}
+      {{#if from.email}}<p>E-Posta: {{from.email}}</p>{{/if}}
+      {{#if from.vergiDairesi}}<p>Vergi Dairesi: {{from.vergiDairesi}}</p>{{/if}}
+      {{#if from.vkn}}<p>VKN: {{from.vkn}}</p>{{/if}}
+    </div>
+    <div class="bill-info">
+      <h2>FATURA</h2>
+      <p><strong>Fatura No:</strong> {{billNumber}}</p>
+      <p><strong>Tarih:</strong> {{date}}</p>
+      {{#if time}}<p><strong>Saat:</strong> {{time}}</p>{{/if}}
+    </div>
+  </div>
+
+  <div class="supplier-info">
+    <p><strong>Sayın {{to.name}}</strong></p>
+    {{#if to.address}}<p>{{to.address}}</p>{{/if}}
+    {{#if to.phone}}<p>Tel: {{to.phone}}</p>{{/if}}
+    {{#if to.email}}<p>E-Posta: {{to.email}}</p>{{/if}}
+    {{#if to.vergiDairesi}}<p>Vergi Dairesi: {{to.vergiDairesi}}</p>{{/if}}
+    {{#if to.vkn}}<p>VKN: {{to.vkn}}</p>{{/if}}
+  </div>
+
+  <table class="items-table">
+    <thead>
+      <tr>
+        <th style="width: 5%;">#</th>
+        <th style="width: 10%;">Ürün Kodu</th>
+        <th style="width: 40%;">Mal / Hizmet</th>
+        <th style="width: 10%;">Miktar</th>
+        <th style="width: 12%;">Birim Fiyat</th>
+        <th style="width: 8%;">KDV Oranı</th>
+        <th style="width: 15%;">Tutar</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each items}}
+      <tr>
+        <td class="text-center">{{@index}}</td>
+        <td class="text-center">{{code}}</td>
+        <td>{{description}}</td>
+        <td class="text-center">{{quantity}}</td>
+        <td class="text-right">{{unitPrice}}</td>
+        <td class="text-center">{{vatRate}}</td>
+        <td class="text-right">{{total}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  <div class="totals">
+    <table>
+      {{#if subtotal}}
+      <tr>
+        <td>Mal Hizmet Toplam Tutarı</td>
+        <td>{{subtotal}} TL</td>
+      </tr>
+      {{/if}}
+      {{#if vatTotal}}
+      <tr>
+        <td>KATMA DEĞER VERGİSİ</td>
+        <td>{{vatTotal}} TL</td>
+      </tr>
+      {{/if}}
+      {{#if totalAmount}}
+      <tr>
+        <td><strong>Toplam Tutar</strong></td>
+        <td><strong>{{totalAmount}} TL</strong></td>
+      </tr>
+      {{/if}}
+      {{#if totalAmount}}
+      <tr>
+        <td><strong>Ödenecek Tutar</strong></td>
+        <td><strong>{{totalAmount}} TL</strong></td>
+      </tr>
+      {{/if}}
+    </table>
+  </div>
+
+  {{#if notes}}
+  <div class="notes">
+    <strong>Notlar:</strong><br>
+    {{notes}}
+  </div>
+  {{/if}}
+
+  <div class="footer">
+    <p>Bu Fatura elektronik ortamda üretilmiştir.</p>
+  </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+

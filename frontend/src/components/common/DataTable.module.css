@@ -1,0 +1,231 @@
+.wrapper {
+  border-radius: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(255, 255, 255, 0.95);
+  overflow: visible;
+  box-shadow:
+    0 12px 25px rgba(15, 23, 42, 0.05),
+    0 6px 12px rgba(15, 23, 42, 0.03);
+  position: relative;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead {
+  background: rgba(15, 23, 42, 0.05);
+  color: #0f172a;
+}
+
+.table th {
+  text-align: center;
+  padding: 0.85rem 1.1rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  font-size: 0.95rem;
+}
+
+.table td {
+  text-align: left;
+  padding: 0.85rem 1.1rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  font-size: 0.95rem;
+}
+
+.table tbody tr:hover {
+  background: rgba(37, 99, 235, 0.06);
+}
+
+.empty {
+  text-align: center;
+  color: #64748b;
+  padding: 2.5rem 1rem;
+}
+
+.thWithFilter {
+  position: relative;
+  text-align: center;
+}
+
+.headerCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  position: relative;
+}
+
+.headerText {
+  font-weight: 600;
+  color: #0f172a;
+  text-align: center;
+}
+
+.filterContainer {
+  position: relative;
+}
+
+.filterButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.5rem;
+  border: 1.5px solid rgba(148, 163, 184, 0.25);
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.9));
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #64748b;
+  position: relative;
+  box-shadow: 
+    0 1px 2px rgba(15, 23, 42, 0.05),
+    0 0 0 0 rgba(59, 130, 246, 0);
+  min-width: 32px;
+  height: 32px;
+}
+
+.filterButton:hover {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(37, 99, 235, 0.05));
+  border-color: rgba(59, 130, 246, 0.4);
+  color: #3b82f6;
+  box-shadow: 
+    0 2px 4px rgba(15, 23, 42, 0.08),
+    0 0 0 3px rgba(59, 130, 246, 0.1);
+  transform: translateY(-1px);
+}
+
+.filterButton:active {
+  transform: translateY(0);
+  box-shadow: 
+    0 1px 2px rgba(15, 23, 42, 0.05),
+    0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+.filterButton.filterActive {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.1));
+  border-color: #3b82f6;
+  color: #2563eb;
+  box-shadow: 
+    0 2px 6px rgba(59, 130, 246, 0.2),
+    0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+.filterBadge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #3b82f6;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border: 2px solid white;
+}
+
+.filterDropdown {
+  position: fixed;
+  background: white;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 0.5rem;
+  box-shadow:
+    0 10px 25px rgba(15, 23, 42, 0.15),
+    0 4px 10px rgba(15, 23, 42, 0.1);
+  z-index: 9999;
+  min-width: 200px;
+  max-width: 300px;
+  max-height: 400px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.filterDropdownHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #0f172a;
+  background: rgba(248, 250, 252, 0.5);
+}
+
+.clearFilterButton {
+  padding: 0.25rem 0.5rem;
+  border: none;
+  background: transparent;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 0.8rem;
+  border-radius: 0.25rem;
+  transition: background 0.2s;
+}
+
+.clearFilterButton:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.filterOptions {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+}
+
+.filterOption {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 0.9rem;
+}
+
+.filterOption:hover {
+  background: rgba(248, 250, 252, 0.8);
+}
+
+.filterOptionSelected {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.filterOption input[type="checkbox"] {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  accent-color: #3b82f6;
+}
+
+.filterOption span {
+  flex: 1;
+  user-select: none;
+}
+
+.noOptions {
+  padding: 1rem;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

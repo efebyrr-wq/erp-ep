@@ -1,0 +1,166 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.insertButton {
+  border: none;
+  background: linear-gradient(135deg, #2563eb, #22d3ee);
+  color: #fff;
+  padding: 0.65rem 1.25rem;
+  border-radius: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.form {
+  display: grid;
+  gap: 1rem;
+}
+
+.form label {
+  display: grid;
+  gap: 0.35rem;
+  color: #475569;
+  font-weight: 600;
+}
+
+.form input,
+.form textarea,
+.form select {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  padding: 0.55rem 0.8rem;
+  font-family: inherit;
+  background: #fff;
+  color: #0f172a;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.form select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none'%3E%3Cpath d='M3.5 5.25L7 8.75L10.5 5.25' stroke='%23475569' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.8rem center;
+  padding-right: 2.5rem;
+  font-weight: 500;
+}
+
+.form select:hover {
+  border-color: rgba(37, 99, 235, 0.5);
+  background-color: #f8fafc;
+}
+
+.form select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  background-color: #fff;
+}
+
+.form select:active {
+  border-color: #2563eb;
+}
+
+.form select option {
+  padding: 0.5rem;
+  background: #fff;
+  color: #0f172a;
+}
+
+.form select option:hover {
+  background: #f1f5f9;
+}
+
+.form textarea {
+  resize: vertical;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.footer button {
+  border-radius: 0.75rem;
+  border: none;
+  padding: 0.55rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.footer button:first-of-type {
+  background: rgba(148, 163, 184, 0.2);
+  color: #475569;
+}
+
+.footer button:last-of-type {
+  background: linear-gradient(135deg, #2563eb, #22d3ee);
+  color: #fff;
+}
+
+.actions {
+  display: inline-flex;
+  gap: 0.5rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.editButton {
+  border: none;
+  background: rgba(59, 130, 246, 0.2);
+  color: #2563eb;
+  padding: 0.45rem 0.75rem;
+  border-radius: 0.65rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.editButton:hover {
+  background: rgba(59, 130, 246, 0.35);
+  transform: translateY(-1px);
+}
+
+.deleteButton {
+  border: none;
+  background: rgba(248, 113, 113, 0.2);
+  color: #dc2626;
+  padding: 0.45rem;
+  border-radius: 0.65rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.deleteButton:hover:not(:disabled) {
+  background: rgba(248, 113, 113, 0.35);
+  transform: translateY(-1px);
+}
+
+.deleteButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+
+
+

@@ -1,0 +1,593 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2rem;
+  color: #0f172a;
+}
+
+.header p {
+  margin: 0.25rem 0 0;
+  color: #475569;
+}
+
+.sectionTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.75rem;
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.cardToggle {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.toggleLabel {
+  font-weight: 600;
+  color: #94a3b8;
+  transition: color 0.2s ease;
+}
+
+.activeToggleLabel {
+  color: #1f2937;
+}
+
+.toggleSwitch {
+  position: relative;
+  width: 64px;
+  height: 30px;
+  border-radius: 9999px;
+  background: rgba(148, 163, 184, 0.45);
+  border: none;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+
+.toggleSwitchActive {
+  background: linear-gradient(135deg, #2563eb, #22d3ee);
+}
+
+.toggleThumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+  transition: transform 0.25s ease;
+}
+
+.toggleSwitchActive .toggleThumb {
+  transform: translateX(34px);
+}
+
+.cardCarousel {
+  display: flex;
+  align-items: stretch;
+  gap: 1rem;
+}
+
+.cardWrapper {
+  flex: 1;
+}
+
+.cardArrow {
+  align-self: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(15, 23, 42, 0.08);
+  color: #1f2933;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.cardArrow:hover:not(:disabled) {
+  background: rgba(37, 99, 235, 0.18);
+  transform: translateY(-1px);
+}
+
+.cardArrow:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.customerCard {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(226, 232, 240, 0.7));
+  border-radius: 2.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  padding: 2rem;
+  box-shadow:
+    0 24px 45px rgba(15, 23, 42, 0.09),
+    0 10px 20px rgba(15, 23, 42, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative;
+  transition: padding-bottom 0.3s ease;
+}
+
+.customerCardExpanded {
+  padding-bottom: 2.5rem;
+}
+
+.customerCard header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.customerCard header > div {
+  flex: 1;
+}
+
+.customerCard header h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #0f172a;
+}
+
+.editButton {
+  padding: 0.5rem 1rem;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.editButton:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+}
+
+.editButton:active {
+  transform: translateY(0);
+}
+
+.cardSubtitle {
+  display: block;
+  margin-top: 0.35rem;
+  color: #2563eb;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.customerCardMetrics {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.customerCardMetrics div {
+  background: rgba(15, 23, 42, 0.08);
+  border-radius: 1.25rem;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.customerCardMetrics span {
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+
+.metricValue {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.customerCardMetrics strong {
+  font-size: 1.15rem;
+  color: #0f172a;
+}
+
+.formFields {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.formFields label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.formFields label span {
+  font-size: 0.85rem;
+}
+
+.formFields input,
+.formFields select {
+  border-radius: 0.6rem;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  padding: 0.45rem 0.75rem;
+  font-size: 0.9rem;
+}
+
+.formFields input:focus,
+.formFields select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+}
+
+.fieldset {
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 0.85rem;
+  padding: 0.85rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.fieldset legend {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #475569;
+  padding: 0 0.4rem;
+}
+
+.tableGroup {
+  display: grid;
+  gap: 2rem;
+}
+
+.buttonGroup {
+  display: inline-flex;
+  gap: 0.75rem;
+}
+
+.buttonGroup button {
+  border: none;
+  border-radius: 0.85rem;
+  padding: 0.55rem 1.1rem;
+  background: linear-gradient(135deg, #2563eb, #22d3ee);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.modalActions button {
+  border-radius: 0.85rem;
+  border: none;
+  padding: 0.55rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.modalActions button:first-of-type {
+  background: rgba(148, 163, 184, 0.2);
+  color: #475569;
+}
+
+.modalActions button:last-of-type {
+  background: linear-gradient(135deg, #2563eb, #22d3ee);
+  color: #fff;
+}
+
+.expandButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(37, 99, 235, 0.15);
+  color: #2563eb;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+}
+
+.expandButton:hover {
+  background: rgba(37, 99, 235, 0.25);
+  transform: scale(1.05);
+}
+
+.expandedContent {
+  margin-top: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.25);
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.transactionsList,
+.operationsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.transactionsList h4,
+.operationsList h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.transactionsTable,
+.operationsTable {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.transactionRow {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 2fr auto;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(15, 23, 42, 0.04);
+  border-radius: 0.75rem;
+  font-size: 0.9rem;
+  align-items: center;
+}
+
+.operationRow {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 2fr auto;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(15, 23, 42, 0.04);
+  border-radius: 0.75rem;
+  font-size: 0.9rem;
+  align-items: center;
+}
+
+.operationRow.operationActive {
+  background: rgba(37, 99, 235, 0.08);
+  border-left: 3px solid #2563eb;
+}
+
+.transactionType,
+.operationType {
+  font-weight: 600;
+  color: #475569;
+}
+
+.transactionDate,
+.operationDate {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.transactionAmount {
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.transactionDetails,
+.operationDetails {
+  color: #64748b;
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.transactionBalance {
+  font-size: 0.8rem;
+  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.balanceLabel {
+  font-weight: 600;
+  color: #475569;
+  font-size: 0.75rem;
+}
+
+.activeBadge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.15rem 0.5rem;
+  background: #10b981;
+  color: white;
+  border-radius: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.transactionActions,
+.operationActions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.navButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.35rem 0.65rem;
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.navButton:hover {
+  background: rgba(37, 99, 235, 0.2);
+  border-color: #2563eb;
+  transform: translateY(-1px);
+}
+
+.navButton svg {
+  flex-shrink: 0;
+}
+
+.operationEndDate {
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
+.noData {
+  text-align: center;
+  color: #94a3b8;
+  padding: 2rem;
+  font-style: italic;
+}
+
+.moreInfo {
+  text-align: center;
+  color: #64748b;
+  padding: 0.75rem;
+  font-size: 0.85rem;
+  font-style: italic;
+  margin-top: 0.5rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.actions button {
+  border-radius: 0.5rem;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actions .deleteButton {
+  background: #ef4444;
+  color: #fff;
+}
+
+.actions .deleteButton:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+}
+
+.successMessage {
+  padding: 0.75rem 1rem;
+  background: #d1fae5;
+  border: 1px solid #10b981;
+  border-radius: 0.5rem;
+  color: #065f46;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.errorMessage {
+  padding: 0.75rem 1rem;
+  background: #fee2e2;
+  border: 1px solid #ef4444;
+  border-radius: 0.5rem;
+  color: #991b1b;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.modalActions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 720px) {
+  .customerCardMetrics {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+
+  .forms {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+
+  .transactionRow {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .transactionActions {
+    justify-content: flex-start;
+  }
+
+  .operationRow {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .operationActions {
+    justify-content: flex-start;
+  }
+
+  .transactionType,
+  .operationType {
+    font-size: 0.95rem;
+  }
+}
+
+
+
+

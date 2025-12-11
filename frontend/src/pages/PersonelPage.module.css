@@ -1,0 +1,269 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.header button {
+  border: none;
+  background: linear-gradient(135deg, #2563eb, #22d3ee);
+  color: #fff;
+  padding: 0.65rem 1.25rem;
+  border-radius: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.actions {
+  display: inline-flex;
+  gap: 0.5rem;
+}
+
+.actions button {
+  border: none;
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.65rem;
+  cursor: pointer;
+}
+
+.form {
+  display: grid;
+  gap: 1rem;
+}
+
+.form label {
+  display: grid;
+  gap: 0.35rem;
+  color: #475569;
+  font-weight: 600;
+}
+
+.form input,
+.form select,
+.form textarea {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  padding: 0.55rem 0.8rem;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.footer button {
+  border-radius: 0.75rem;
+  border: none;
+  padding: 0.55rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.footer button:first-of-type {
+  background: rgba(148, 163, 184, 0.2);
+  color: #475569;
+}
+
+.footer button:last-of-type {
+  background: linear-gradient(135deg, #2563eb, #22d3ee);
+  color: #fff;
+}
+
+.greenAmount {
+  color: #22c55e;
+  font-weight: 700;
+}
+
+.details {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.personelLabel {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  background: rgba(37, 99, 235, 0.08);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.personelName,
+.personelRole {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.personelName::before {
+  content: '👤 ';
+  margin-right: 0.25rem;
+}
+
+.personelRole::before {
+  content: '💼 ';
+  margin-right: 0.25rem;
+}
+
+.detailsSection {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.detailsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.editDetailsBtn {
+  border: none;
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.65rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.detailActionBar {
+  display: flex;
+  gap: 8px;
+}
+
+.cancelBtn {
+  border: none;
+  background: rgba(148, 163, 184, 0.25);
+  color: #334155;
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.65rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.saveBtn {
+  border: none;
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  color: #fff;
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.65rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  background: rgba(248, 250, 252, 0.7);
+  gap: 0.75rem;
+}
+
+.detailContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+  gap: 1rem;
+}
+
+.detailName {
+  color: #475569;
+  font-size: 1.1rem;
+  font-weight: 600;
+  min-width: 180px;
+}
+
+.detailValue {
+  color: #0f172a;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.detailInput {
+  border-radius: 0.6rem;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  padding: 0.5rem 0.7rem;
+  min-width: 220px;
+  font-size: 1.05rem;
+}
+
+.deleteDetailBtn {
+  border: none;
+  background: rgba(248, 113, 113, 0.2);
+  color: #dc2626;
+  padding: 0.5rem;
+  border-radius: 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.deleteDetailBtn:hover:not(:disabled) {
+  background: rgba(248, 113, 113, 0.35);
+  transform: translateY(-1px);
+}
+
+.deleteDetailBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.addDetailBtn {
+  border: none;
+  background: linear-gradient(135deg, #2563eb, #22d3ee);
+  color: #fff;
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.65rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.addDetailForm {
+  margin-top: 0.5rem;
+}
+
+.addDetailActions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.addDetailSubmitBtn {
+  border: none;
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  color: #fff;
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.65rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.addDetailCancelBtn {
+  border: none;
+  background: rgba(148, 163, 184, 0.25);
+  color: #334155;
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.65rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+

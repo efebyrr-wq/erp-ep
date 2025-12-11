@@ -1,0 +1,72 @@
+.card {
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(226, 232, 240, 0.35));
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow:
+    0 15px 30px rgba(15, 23, 42, 0.06),
+    0 5px 15px rgba(15, 23, 42, 0.04);
+}
+
+.card header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+  color: #475569;
+  font-weight: 600;
+}
+
+.card strong {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.card span {
+  font-size: 0.85rem;
+  color: rgba(15, 23, 42, 0.6);
+}
+
+.blue {
+  --accent: linear-gradient(135deg, #2563eb, #22d3ee);
+}
+
+.teal {
+  --accent: linear-gradient(135deg, #0ea5e9, #22c55e);
+}
+
+.amber {
+  --accent: linear-gradient(135deg, #f59e0b, #f97316);
+}
+
+.rose {
+  --accent: linear-gradient(135deg, #f472b6, #ec4899);
+}
+
+.card strong::after {
+  content: '';
+  display: block;
+  width: 48px;
+  height: 4px;
+  margin-top: 0.75rem;
+  border-radius: 9999px;
+  background: var(--accent, linear-gradient(135deg, #2563eb, #22d3ee));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

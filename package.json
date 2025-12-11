@@ -1,0 +1,9 @@
+{
+  "name": "erp-2025",
+  "version": "1.0.0",
+  "description": "ERP 2025 Application",
+  "private": true,
+  "dependencies": {
+    "pg": "^8.16.3"
+  }
+}

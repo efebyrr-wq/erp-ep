@@ -1,0 +1,17 @@
+node_modules
+dist
+*.log
+.env
+.env.local
+.env.development
+.git
+.gitignore
+README.md
+coverage
+.nyc_output
+*.md
+
+
+
+
+
