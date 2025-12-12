@@ -38,44 +38,47 @@ const LOCAL_DB = {
 
 const RDS_ENDPOINT = process.env.RDS_ENDPOINT || 'https://d31tialuhzl449.cloudfront.net';
 
-// Tables in dependency order (child tables first for truncate, parent first for insert)
+// Tables in dependency order for INSERT (parent tables first, then child tables)
+// This ensures foreign keys exist before dependent records are inserted
 const tables = [
-  'tax_payments',
-  'outsource_invoice_lines',
-  'invoice_lines_rental',
-  'invoice_lines',
-  'invoices',
-  'bill_lines_rental',
-  'bill_lines',
-  'bills',
-  'collection_cash',
-  'collection_credit_card',
-  'collections_check',
-  'payment_cash',
-  'payment_credit_card',
-  'payments_cash',
-  'payments_check',
-  'service_operations',
-  'internal_operations',
-  'outsource_operations',
-  'transportation_operations',
-  'operations_details',
-  'machinery_specs',
+  // Parent tables first (no foreign keys or only reference other parent tables)
+  'accounts',
+  'personel',
+  'customers',
+  'suppliers',
+  'outsourcers',
+  'working_sites',
   'machinery',
   'vehicles',
+  'inventory',
+  // Child tables (have foreign keys to parent tables above)
+  'personel_details',
+  'personel_payments',
+  'contact_persons',
   'supplier_contact_persons',
   'supplies',
-  'suppliers',
   'outsourcer_contact_persons',
-  'outsourcers',
-  'inventory',
-  'working_sites',
-  'contact_persons',
-  'customers',
-  'personel_payments',
-  'personel_details',
-  'personel',
-  'accounts',
+  'machinery_specs', // References machinery
+  'internal_operations', // References customers, machinery, working_sites
+  'outsource_operations', // References customers, outsourcers, machinery, working_sites
+  'service_operations', // References machinery
+  'transportation_operations',
+  'operations_details', // References operations
+  'bills', // References customers
+  'bill_lines', // References bills
+  'bill_lines_rental', // References bill_lines
+  'invoices', // References customers
+  'invoice_lines', // References invoices
+  'invoice_lines_rental', // References invoice_lines
+  'outsource_invoice_lines', // References invoices
+  'payments_check',
+  'payments_cash',
+  'payment_credit_card',
+  'payment_cash',
+  'collections_check',
+  'collection_credit_card',
+  'collection_cash',
+  'tax_payments', // References accounts
 ];
 
 async function exportData() {
@@ -90,19 +93,8 @@ async function exportData() {
     // Export data from each table
     console.log('\n📤 Exporting data from local database...');
     
-    for (const table of tables.reverse()) { // Reverse to export parent tables first
+    for (const table of tables) { // Export in dependency order (parent first, then children)
       try {
-        // Get identity columns for this table
-        const identityCols = await localDS.query(`
-          SELECT column_name 
-          FROM information_schema.columns 
-          WHERE table_schema = 'public' 
-            AND table_name = $1 
-            AND is_identity = 'YES'
-        `, [table]);
-        
-        const identityColumnNames = new Set(identityCols.map(col => col.column_name));
-        
         const rows = await localDS.query(`SELECT * FROM public.${table}`);
         
         if (rows.length === 0) {
@@ -110,18 +102,22 @@ async function exportData() {
           continue;
         }
 
-        // Get column names, excluding identity columns
+        // Get all columns from local data
         const allColumns = Object.keys(rows[0]);
-        const columns = allColumns.filter(col => !identityColumnNames.has(col));
         
-        if (columns.length === 0) {
-          console.log(`   ⏭️  ${table}: only identity columns, skipping`);
+        // Filter out columns that don't exist in RDS schema
+        // Known problematic columns that exist in local but not in RDS
+        const invalidColumns = new Set(['transportation_operation_id']);
+        const validColumns = allColumns.filter(col => !invalidColumns.has(col));
+        
+        if (validColumns.length === 0) {
+          console.log(`   ⏭️  ${table}: no valid columns for RDS, skipping`);
           continue;
         }
         
-        // Build INSERT statements
+        // Build INSERT statements with only valid columns (that exist in RDS)
         for (const row of rows) {
-          const values = columns.map(col => {
+          const values = validColumns.map(col => {
             const val = row[col];
             if (val === null || val === undefined) return 'NULL';
             if (typeof val === 'string') return `'${val.replace(/'/g, "''")}'`;
@@ -130,7 +126,9 @@ async function exportData() {
             return String(val);
           });
           
-          const insertSQL = `INSERT INTO public.${table} (${columns.join(', ')}) VALUES (${values.join(', ')}) ON CONFLICT DO NOTHING;`;
+          // Include ID columns to maintain foreign key relationships
+          // Use OVERRIDING SYSTEM VALUE to allow inserting specific ID values
+          const insertSQL = `INSERT INTO public.${table} (${validColumns.join(', ')}) OVERRIDING SYSTEM VALUE VALUES (${values.join(', ')}) ON CONFLICT DO NOTHING;`;
           sqlStatements.push(insertSQL);
         }
         
