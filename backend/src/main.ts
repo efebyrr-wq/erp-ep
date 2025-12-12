@@ -54,6 +54,7 @@ async function bootstrap() {
   const port = Number(process.env.PORT ?? 3000);
   await app.listen(port);
   logger.log(`🚀 Backend listening on http://localhost:${port}`);
+  logger.log(`📡 CORS enabled for: ${corsOrigins.length > 0 ? corsOrigins.join(', ') : 'all origins'}`);
 }
 
 bootstrap().catch((error) => {
