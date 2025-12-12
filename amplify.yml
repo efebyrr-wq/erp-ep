@@ -19,7 +19,6 @@ frontend:
     build:
       commands:
         - 'echo "Build phase - Current directory: $(pwd)"'
-        - cd frontend
         - npm run build
         - echo "Build completed successfully"
   artifacts:
