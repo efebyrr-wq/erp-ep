@@ -38,7 +38,7 @@ jobs:
 
       - name: Build status check
         run: |
-          echo "📊 Frontend changes detected in:"
-          git diff --name-only HEAD~1 HEAD 2>/dev/null | grep -E '^frontend/|^amplify.yml' || echo "✅ Amplify will auto-detect changes and deploy"
-          exit 0
+          echo "✅ Frontend workflow completed successfully"
+          echo "📋 Amplify will automatically detect changes and deploy"
+          echo "🔗 Monitor at: https://console.aws.amazon.com/amplify"
 

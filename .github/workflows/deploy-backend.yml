@@ -29,18 +29,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
 
       - name: Install dependencies
         working-directory: ./backend
-        run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            echo "⚠️ package-lock.json not found, using npm install"
-            npm install
-          fi
+        run: npm install
 
       - name: Build backend
         working-directory: ./backend
