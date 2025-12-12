@@ -50,7 +50,7 @@ type PageTab = 'machinery' | 'vehicles';
 
 export default function MachineryPage() {
   const [tab, setTab] = useState<PageTab>('machinery');
-  const [machinery, setMachinery] = useState<Machinery[]>(mockMachinery);
+  const [machinery, setMachinery] = useState<Machinery[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [filter, setFilter] = useState('');
   const [formModalOpen, setFormModalOpen] = useState(false);
@@ -79,7 +79,7 @@ export default function MachineryPage() {
   const [deletingVehicleId, setDeletingVehicleId] = useState<string | null>(null);
 
   const fetchMachinery = useCallback(async () => {
-    const data = await apiGet<Machinery[]>('/machinery', mockMachinery);
+    const data = await apiGet<Machinery[]>('/machinery', []);
     setMachinery(
       data.map((machine) => ({
         id: machine.id,
