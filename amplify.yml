@@ -11,7 +11,7 @@ frontend:
   phases:
     preBuild:
       commands:
-        - echo "Building frontend for branch: $AWS_BRANCH"
+        - 'echo "Building frontend for branch: $AWS_BRANCH"'
         - cd frontend
         - npm ci
     build:
