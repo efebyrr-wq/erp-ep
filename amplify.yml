@@ -13,7 +13,7 @@ frontend:
       commands:
         - 'echo "Building frontend for branch: $AWS_BRANCH"'
         - cd frontend
-        - npm ci
+        - npm install
     build:
       commands:
         - cd frontend
