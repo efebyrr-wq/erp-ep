@@ -79,19 +79,26 @@ export default function MachineryPage() {
   const [deletingVehicleId, setDeletingVehicleId] = useState<string | null>(null);
 
   const fetchMachinery = useCallback(async () => {
-    const data = await apiGet<Machinery[]>('/machinery', []);
-    setMachinery(
-      data.map((machine) => ({
-        id: machine.id,
-        machineNumber: machine.machineNumber,
-        machineCode: machine.machineCode,
-        status: machine.status,
-        latitude: machine.latitude,
-        longitude: machine.longitude,
-        createdAt: machine.createdAt,
-        specs: machine.specs ?? [],
-      })),
-    );
+    try {
+      console.log('🔍 Fetching machinery data...');
+      const data = await apiGet<Machinery[]>('/machinery', []);
+      console.log(`✅ Fetched ${data.length} machinery records`, data);
+      setMachinery(
+        data.map((machine) => ({
+          id: machine.id,
+          machineNumber: machine.machineNumber,
+          machineCode: machine.machineCode,
+          status: machine.status,
+          latitude: machine.latitude,
+          longitude: machine.longitude,
+          createdAt: machine.createdAt,
+          specs: machine.specs ?? [],
+        })),
+      );
+      console.log(`✅ Set ${data.length} machinery records in state`);
+    } catch (error) {
+      console.error('❌ Error fetching machinery:', error);
+    }
   }, []);
 
   const fetchVehicles = useCallback(async () => {

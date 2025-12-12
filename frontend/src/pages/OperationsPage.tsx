@@ -344,7 +344,10 @@ export default function OperationsPage() {
       setVehicles(data);
     });
     void apiGet<InternalOperation[]>('/operations/internal', []).then((data) => {
+      console.log(`✅ Fetched ${data.length} internal operations`, data);
       setInternalOps(data);
+    }).catch((error) => {
+      console.error('❌ Error fetching internal operations:', error);
     });
     void apiGet<OutsourceOperation[]>('/operations/outsource', []).then((data) => {
       setOutsourceOps(data);
