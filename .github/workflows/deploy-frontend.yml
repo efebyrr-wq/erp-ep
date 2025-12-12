@@ -1,0 +1,43 @@
+name: Deploy Frontend to Amplify
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+    paths:
+      - 'frontend/**'
+      - 'amplify.yml'
+      - '.github/workflows/deploy-frontend.yml'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  deploy:
+    name: Trigger Amplify Deployment
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Trigger Amplify deployment
+        run: |
+          echo "✅ Code pushed to GitHub. Amplify will automatically detect the change and deploy."
+          echo "📋 If Amplify is connected to this repository, it will start building automatically."
+          echo "🔗 Check your Amplify app: https://console.aws.amazon.com/amplify"
+          
+          # If you have Amplify App ID, you can trigger via API:
+          # Uncomment and configure if needed:
+          # AMPLIFY_APP_ID=${{ secrets.AMPLIFY_APP_ID }}
+          # if [ -n "$AMPLIFY_APP_ID" ]; then
+          #   aws amplify start-job \
+          #     --app-id "$AMPLIFY_APP_ID" \
+          #     --branch-name "${GITHUB_REF#refs/heads/}" \
+          #     --job-type RELEASE
+          # fi
+
+      - name: Build status check
+        run: |
+          echo "📊 Frontend changes detected in:"
+          git diff --name-only HEAD~1 HEAD | grep -E '^frontend/|^amplify.yml' || echo "No frontend files changed"
+

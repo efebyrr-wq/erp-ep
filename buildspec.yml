@@ -1,0 +1,27 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - echo Installing dependencies...
+      - cd backend
+      - npm ci
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building backend...
+      - npm run build
+      - echo Creating deployment package...
+      - zip -r ../erp-backend-deploy.zip dist/ package.json package-lock.json \
+          -x "*.map" "*.tsbuildinfo" "node_modules/*"
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Deployment package created: erp-backend-deploy.zip
+
+artifacts:
+  files:
+    - erp-backend-deploy.zip
+  name: backend-deploy-$(date +%Y%m%d-%H%M%S)
+

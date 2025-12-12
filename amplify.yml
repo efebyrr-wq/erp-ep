@@ -1,6 +1,7 @@
 version: 1
 
-# Amplify hosting build for the "frontend" app (staging branch).
+# Amplify hosting build configuration for frontend
+# Works for all branches (main, staging, etc.)
 # Ensures VITE_API_BASE_URL is set to CloudFront so production builds never fall back to HTTP.
 env:
   variables:
@@ -10,12 +11,14 @@ frontend:
   phases:
     preBuild:
       commands:
+        - echo "Building frontend for branch: $AWS_BRANCH"
         - cd frontend
         - npm ci
     build:
       commands:
         - cd frontend
         - npm run build
+        - echo "Build completed successfully"
   artifacts:
     baseDirectory: frontend/dist
     files:

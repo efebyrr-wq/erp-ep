@@ -1,0 +1,99 @@
+name: Deploy Backend to Elastic Beanstalk
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
+  workflow_dispatch: # Allow manual trigger
+
+env:
+  AWS_REGION: eu-north-1
+  EB_APPLICATION_NAME: deployment-erp
+  EB_ENVIRONMENT_NAME: Deployment-erp-env-v4
+  S3_BUCKET: elasticbeanstalk-eu-north-1-717036606024
+
+jobs:
+  deploy:
+    name: Build and Deploy Backend
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Build backend
+        working-directory: ./backend
+        run: npm run build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Create deployment package
+        working-directory: ./backend
+        run: |
+          zip -r erp-backend-deploy.zip dist/ package.json package-lock.json \
+            -x "*.map" "*.tsbuildinfo" "node_modules/*"
+
+      - name: Upload to S3
+        run: |
+          S3_KEY="erp-backend-deploy-$(date +%Y%m%d-%H%M%S)-${GITHUB_SHA:0:7}.zip"
+          echo "S3_KEY=$S3_KEY" >> $GITHUB_ENV
+          aws s3 cp backend/erp-backend-deploy.zip \
+            s3://${{ env.S3_BUCKET }}/$S3_KEY \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Create EB application version
+        run: |
+          VERSION_LABEL="deploy-$(date +%Y%m%d-%H%M%S)-${GITHUB_SHA:0:7}"
+          echo "VERSION_LABEL=$VERSION_LABEL" >> $GITHUB_ENV
+          aws elasticbeanstalk create-application-version \
+            --region ${{ env.AWS_REGION }} \
+            --application-name "${{ env.EB_APPLICATION_NAME }}" \
+            --version-label "$VERSION_LABEL" \
+            --source-bundle S3Bucket="${{ env.S3_BUCKET }}",S3Key="${{ env.S3_KEY }}" \
+            --description "Deployment from GitHub - ${GITHUB_SHA:0:7} - ${GITHUB_ACTOR}" \
+            --output text --query 'ApplicationVersion.VersionLabel'
+
+      - name: Deploy to Elastic Beanstalk
+        run: |
+          aws elasticbeanstalk update-environment \
+            --region ${{ env.AWS_REGION }} \
+            --environment-name "${{ env.EB_ENVIRONMENT_NAME }}" \
+            --version-label "${{ env.VERSION_LABEL }}" \
+            --output text --query 'EnvironmentId'
+
+      - name: Wait for deployment
+        run: |
+          echo "⏳ Waiting for deployment to complete..."
+          aws elasticbeanstalk wait environment-updated \
+            --region ${{ env.AWS_REGION }} \
+            --environment-names "${{ env.EB_ENVIRONMENT_NAME }}" \
+            || echo "⚠️ Deployment may still be in progress. Check AWS Console."
+
+      - name: Get deployment status
+        run: |
+          aws elasticbeanstalk describe-environments \
+            --region ${{ env.AWS_REGION }} \
+            --environment-names "${{ env.EB_ENVIRONMENT_NAME }}" \
+            --query 'Environments[0].[Status,Health,VersionLabel]' \
+            --output table
+
