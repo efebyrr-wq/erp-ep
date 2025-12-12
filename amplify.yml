@@ -12,10 +12,13 @@ frontend:
     preBuild:
       commands:
         - 'echo "Building frontend for branch: $AWS_BRANCH"'
+        - 'echo "Current directory: $(pwd)"'
+        - 'echo "Listing files: $(ls -la)"'
         - cd frontend
         - npm install
     build:
       commands:
+        - 'echo "Build phase - Current directory: $(pwd)"'
         - cd frontend
         - npm run build
         - echo "Build completed successfully"
