@@ -34,7 +34,13 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./backend
-        run: npm ci
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            echo "⚠️ package-lock.json not found, using npm install"
+            npm install
+          fi
 
       - name: Build backend
         working-directory: ./backend

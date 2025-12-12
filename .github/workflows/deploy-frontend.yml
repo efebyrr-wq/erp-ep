@@ -39,5 +39,6 @@ jobs:
       - name: Build status check
         run: |
           echo "📊 Frontend changes detected in:"
-          git diff --name-only HEAD~1 HEAD | grep -E '^frontend/|^amplify.yml' || echo "No frontend files changed"
+          git diff --name-only HEAD~1 HEAD 2>/dev/null | grep -E '^frontend/|^amplify.yml' || echo "✅ Amplify will auto-detect changes and deploy"
+          exit 0
 
