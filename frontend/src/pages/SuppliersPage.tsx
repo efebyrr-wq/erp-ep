@@ -8,13 +8,7 @@ import { FilterBar } from '../components/common/FilterBar';
 import { Modal } from '../components/common/Modal';
 import { Tabs } from '../components/common/Tabs';
 import { apiGet, apiPost, apiPatch, apiDelete } from '../lib/api';
-import {
-  mockSuppliers,
-  mockInvoices,
-  mockPaymentCheck,
-  mockPaymentCreditCard,
-  mockPaymentsCash,
-} from '../lib/mockData';
+// Removed unused mock data imports
 import type {
   Supplier,
   SupplierContact,

@@ -19,7 +19,7 @@ response1=$(curl -s -X POST "${CLOUDFRONT_URL}/database/migrate-date-to-timestam
 http_status1=$(echo "$response1" | grep "HTTP_STATUS:" | cut -d: -f2)
 response_body1=$(echo "$response1" | grep -v "HTTP_STATUS:")
 
-if [ "$http_status1" = "200" ]; then
+if [ "$http_status1" = "200" ] || [ "$http_status1" = "201" ]; then
   echo "✅ Migration 1 successful!"
   echo "$response_body1" | jq '.' 2>/dev/null || echo "$response_body1"
 else
@@ -37,7 +37,7 @@ response2=$(curl -s -X POST "${CLOUDFRONT_URL}/database/migrate-remove-outsource
 http_status2=$(echo "$response2" | grep "HTTP_STATUS:" | cut -d: -f2)
 response_body2=$(echo "$response2" | grep -v "HTTP_STATUS:")
 
-if [ "$http_status2" = "200" ]; then
+if [ "$http_status2" = "200" ] || [ "$http_status2" = "201" ]; then
   echo "✅ Migration 2 successful!"
   echo "$response_body2" | jq '.' 2>/dev/null || echo "$response_body2"
 else

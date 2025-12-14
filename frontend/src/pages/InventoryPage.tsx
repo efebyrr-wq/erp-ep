@@ -29,6 +29,7 @@ export default function InventoryPage() {
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
   const [supplies, setSupplies] = useState<Supply[]>([]);
   const [selectedSupplyId, setSelectedSupplyId] = useState<string>('');
+  const [usedAt, setUsedAt] = useState<string>('');
 
   useEffect(() => {
     void apiGet<InventoryItem[]>('/inventory', []).then((data) => {

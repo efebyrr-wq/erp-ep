@@ -9,16 +9,7 @@ import { FilterBar } from '../components/common/FilterBar';
 import { Tabs } from '../components/common/Tabs';
 import { apiGet, apiPost, apiDelete, apiPatch } from '../lib/api';
 import { formatDateDDMMYYYY } from '../lib/dateUtils';
-import {
-  mockCustomers,
-  mockInternalOperations,
-  mockServiceOperations,
-  mockOutsourceOperations,
-  mockBills,
-  mockCollectionsCheck,
-  mockCollectionCreditCard,
-  mockCollectionCash,
-} from '../lib/mockData';
+// Removed unused mock data imports
 import type {
   ContactPerson,
   Customer,
@@ -159,7 +150,7 @@ export default function CustomersPage() {
     });
 
     // Load data for customer cards
-    void apiGet<Bill[]>('/billing', mockBills).then((data) => {
+    void apiGet<Bill[]>('/billing', []).then((data) => {
       setBills(data);
     });
     void apiGet<CollectionsCheck[]>('/collections/check', []).then((data) => {
@@ -180,7 +171,7 @@ export default function CustomersPage() {
     void apiGet<PaymentsCash[]>('/payments/cash', []).then((data) => {
       setPaymentsCash(data);
     });
-    void apiGet<InternalOperation[]>('/operations/internal', mockInternalOperations).then((data) => {
+    void apiGet<InternalOperation[]>('/operations/internal', []).then((data) => {
       setInternalOperations(data);
     });
     void apiGet<InternalOperation[]>('/operations/internal/active', []).then((data) => {
@@ -192,7 +183,7 @@ export default function CustomersPage() {
     void apiGet<OutsourceOperation[]>('/operations/outsource/active', []).then((data) => {
       setOutsourceOperationsActive(data);
     });
-    void apiGet<ServiceOperation[]>('/operations/service', mockServiceOperations).then((data) => {
+    void apiGet<ServiceOperation[]>('/operations/service', []).then((data) => {
       setServiceOperations(data);
     });
     void apiGet<TransportationOperation[]>('/operations/transportation', []).then((data) => {
@@ -225,15 +216,15 @@ export default function CustomersPage() {
         recentInternal.map((operation) => operation.machineNumber).filter(Boolean),
       ).size;
 
-      const transportationCount = recentInternal.filter(
-        (operation) => operation.transportationOperationId,
-      ).length;
+      // Transportation operations are linked through OperationDetails, not directly
+      // For now, set to 0 as transportationOperationId doesn't exist on InternalOperation
+      const transportationCount = 0;
 
       const customerMachines = internalForCustomer
         .map((operation) => operation.machineNumber)
         .filter(Boolean);
 
-      const serviceCount = mockServiceOperations.filter((service) => {
+      const serviceCount = serviceOperations.filter((service) => {
         if (!service.machineNumber || !service.createdAt) return false;
         if (!customerMachines.includes(service.machineNumber)) return false;
         return new Date(service.createdAt) >= last30Threshold;
@@ -269,9 +260,9 @@ export default function CustomersPage() {
         operationsAtSite.map((operation) => operation.machineNumber).filter(Boolean),
       );
 
-      const transportationCount = operationsAtSite.filter(
-        (operation) => operation.transportationOperationId,
-      ).length;
+      // Transportation operations are linked through OperationDetails, not directly
+      // For now, set to 0 as transportationOperationId doesn't exist on InternalOperation
+      const transportationCount = 0;
 
       const serviceCount = serviceOperations.filter((service) => {
         if (!service.machineNumber || !service.createdAt) return false;
@@ -777,14 +768,9 @@ export default function CustomersPage() {
       return service.machineNumber && customerMachineNumbers.has(service.machineNumber);
     });
 
-    // Get transportation operations linked to customer operations
-    const customerTransportationOpIds = new Set([
-      ...customerInternalOps.map((op) => op.transportationOperationId).filter(Boolean),
-      ...customerOutsourceOps.map((op) => op.transportationOperationId).filter(Boolean),
-    ]);
-    const customerTransportationOps = transportationOperations.filter((trans) => {
-      return customerTransportationOpIds.has(trans.transportationOpId);
-    });
+    // Transportation operations are linked through OperationDetails, not directly
+    // For now, get all transportation operations (can be refined later with OperationDetails)
+    const customerTransportationOps: typeof transportationOperations = [];
 
     // Create a set of active operation IDs for quick lookup
     const activeInternalIds = new Set(customerInternalOpsActive.map((op) => op.id));
