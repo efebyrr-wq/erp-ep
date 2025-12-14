@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Tabs } from '../components/common/Tabs';
+import { DateInput } from '../components/common/DateInput';
 import { apiGet } from '../lib/api';
+import { convertDDMMYYYYToYYYYMMDD, convertYYYYMMDDToDDMMYYYY } from '../lib/dateUtils';
 import type { Customer } from '../types';
 import styles from './PdfGenerationPage.module.css';
 import html2canvas from 'html2canvas';
@@ -50,7 +52,7 @@ export default function PdfGenerationPage() {
       vkn: '',
     },
     offerNumber: '',
-    date: new Date().toISOString().split('T')[0],
+    date: convertYYYYMMDDToDDMMYYYY(new Date().toISOString().split('T')[0]),
     validUntil: '',
     items: [
       {
@@ -108,7 +110,7 @@ export default function PdfGenerationPage() {
     },
     invoiceNumber: '',
     terms: 'Due On Receipt',
-    date: new Date().toISOString().split('T')[0],
+    date: convertYYYYMMDDToDDMMYYYY(new Date().toISOString().split('T')[0]),
     dueDate: '',
     items: [
       {
@@ -161,6 +163,10 @@ export default function PdfGenerationPage() {
         'button[class*="newItemButton"]', // Yeni Öğe buttons
         'button[class*="removeItemButton"]', // Item silme buttons (ikinci satırdan başlayan)
         'button[class*="removeTaxDiscountButton"]', // Vergi/İndirim çöp kutusu ikonları
+        'button[aria-label="Open date picker"]', // Hide calendar icons
+        'button[aria-label="Open date picker"] svg', // Hide calendar icon SVGs
+        '.topRightDates button', // Hide all buttons in date area (calendar icons)
+        '.topRightDates svg', // Hide all SVGs in date area (calendar icons)
       ];
       
       const hiddenElements: Array<{ element: HTMLElement; originalDisplay: string }> = [];
@@ -175,6 +181,36 @@ export default function PdfGenerationPage() {
           });
           htmlElement.style.display = 'none';
         });
+      });
+
+      // Convert textareas to divs to preserve newlines in PDF
+      const textareas = formElement.querySelectorAll('textarea');
+      const textareaReplacements: Array<{ textarea: HTMLTextAreaElement; replacement: HTMLDivElement }> = [];
+      
+      textareas.forEach((textarea) => {
+        const div = document.createElement('div');
+        div.textContent = textarea.value;
+        div.style.cssText = window.getComputedStyle(textarea).cssText;
+        div.style.whiteSpace = 'pre-wrap';
+        div.style.wordWrap = 'break-word';
+        div.style.overflow = 'hidden';
+        div.style.height = textarea.offsetHeight + 'px';
+        div.style.minHeight = textarea.style.minHeight || '100px';
+        div.style.maxHeight = textarea.style.maxHeight || '300px';
+        div.style.resize = 'none';
+        div.style.padding = window.getComputedStyle(textarea).padding;
+        div.style.border = window.getComputedStyle(textarea).border;
+        div.style.borderRadius = window.getComputedStyle(textarea).borderRadius;
+        div.style.fontSize = window.getComputedStyle(textarea).fontSize;
+        div.style.fontFamily = window.getComputedStyle(textarea).fontFamily;
+        div.style.backgroundColor = window.getComputedStyle(textarea).backgroundColor;
+        div.style.color = window.getComputedStyle(textarea).color;
+        div.style.width = textarea.offsetWidth + 'px';
+        div.style.boxSizing = 'border-box';
+        
+        textarea.parentNode?.insertBefore(div, textarea);
+        textarea.style.display = 'none';
+        textareaReplacements.push({ textarea, replacement: div });
       });
 
       // Capture the form as canvas with high quality
@@ -255,6 +291,12 @@ export default function PdfGenerationPage() {
       // Restore all hidden buttons after capturing
       hiddenElements.forEach(({ element, originalDisplay }) => {
         element.style.display = originalDisplay || '';
+      });
+
+      // Restore textareas and remove replacement divs
+      textareaReplacements.forEach(({ textarea, replacement }) => {
+        textarea.style.display = '';
+        replacement.remove();
       });
 
       if (preview) {
@@ -604,25 +646,21 @@ export default function PdfGenerationPage() {
               <div className={styles.topRightDates}>
                 <div className={styles.dateField}>
                   <label className={styles.dateLabel}>Tarih</label>
-                  <input
-                    type="date"
+                    <DateInput
                     value={pricingOfferForm.date}
-                    onChange={(e) =>
-                      setPricingOfferForm((prev) => ({ ...prev, date: e.target.value }))
+                    onChange={(value) =>
+                      setPricingOfferForm((prev) => ({ ...prev, date: value }))
                     }
-                    className={styles.dateInput}
                     required
                   />
                 </div>
                 <div className={styles.dateField}>
                   <label className={styles.dateLabel}>Geçerlilik Tarihi</label>
-                  <input
-                    type="date"
+                  <DateInput
                     value={pricingOfferForm.validUntil || ''}
-                    onChange={(e) =>
-                      setPricingOfferForm((prev) => ({ ...prev, validUntil: e.target.value }))
+                    onChange={(value) =>
+                      setPricingOfferForm((prev) => ({ ...prev, validUntil: value }))
                     }
-                    className={styles.dateInput}
                   />
                 </div>
               </div>
@@ -702,11 +740,6 @@ export default function PdfGenerationPage() {
                     className={styles.logoImage}
                   />
                 </div>
-                {/* Balance Due under Logo */}
-                <div className={styles.balanceDueUnderLogo}>
-                  <span className={styles.balanceDueLabel}>Ödenecek Tutar</span>
-                  <span className={styles.balanceDueValue}>₺{pricingOfferForm.balanceDue}</span>
-                </div>
               </div>
             </div>
 
@@ -738,7 +771,7 @@ export default function PdfGenerationPage() {
                       </div>
                       <div className={styles.itemPrice}>
                         <div className={styles.priceInputWrapper}>
-                          <span className={styles.currencySymbol}>$</span>
+                          <span className={styles.currencySymbol}>₺</span>
                           <input
                             className={styles.itemInput}
                             type="text"
@@ -781,128 +814,19 @@ export default function PdfGenerationPage() {
                 </div>
               </div>
 
-              {/* Notes and Tax/Discount Section - Same Row */}
-              <div className={styles.notesAndTaxRow}>
-                {/* Notes Section */}
-                <div className={styles.notesSection}>
-                  <label>
-                    <span>Ekstra Notlar</span>
-                    <textarea
-                      value={pricingOfferForm.notes}
-                      onChange={(e) =>
-                        setPricingOfferForm((prev) => ({ ...prev, notes: e.target.value }))
-                      }
-                      rows={4}
-                      placeholder="Add any additional notes or comments..."
-                    />
-                  </label>
-                </div>
-
-                {/* Tax and Discount Section */}
-                <div className={styles.financialSummary}>
-                  <div className={styles.summaryRow}>
-                    <span className={styles.summaryLabel}>Ara Toplam</span>
-                    <span className={styles.summaryValue}>₺{pricingOfferForm.subtotal}</span>
-                  </div>
-                  
-                  {pricingOfferForm.tax.enabled && (
-                    <div className={styles.taxDiscountRow}>
-                      <div className={styles.taxDiscountButtons}>
-                        <button
-                          type="button"
-                          className={`${styles.taxDiscountToggle} ${pricingOfferForm.tax.type === 'percent' ? styles.active : ''}`}
-                          onClick={() => updatePricingOfferTax('type', 'percent')}
-                        >
-                          %
-                        </button>
-                        <button
-                          type="button"
-                          className={`${styles.taxDiscountToggle} ${pricingOfferForm.tax.type === 'fixed' ? styles.active : ''}`}
-                          onClick={() => updatePricingOfferTax('type', 'fixed')}
-                        >
-                          $
-                        </button>
-                      </div>
-                      <span className={styles.summaryLabel}>Vergi</span>
-                      <button
-                        type="button"
-                        className={styles.removeTaxDiscountButton}
-                        onClick={() => updatePricingOfferTax('enabled', false)}
-                      >
-                        🗑️
-                      </button>
-                      <div className={styles.taxDiscountInput}>
-                        <input
-                          type="number"
-                          value={pricingOfferForm.tax.value}
-                          onChange={(e) => updatePricingOfferTax('value', e.target.value)}
-                          placeholder="0"
-                          step="0.01"
-                        />
-                        <span className={styles.taxDiscountSymbol}>{pricingOfferForm.tax.type === 'percent' ? '%' : '$'}</span>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {!pricingOfferForm.tax.enabled && (
-                    <button
-                      type="button"
-                      className={styles.addTaxButton}
-                      onClick={() => updatePricingOfferTax('enabled', true)}
-                    >
-                      + Vergi
-                    </button>
-                  )}
-
-                  {pricingOfferForm.discount.enabled && (
-                    <div className={styles.taxDiscountRow}>
-                      <div className={styles.taxDiscountButtons}>
-                        <button
-                          type="button"
-                          className={`${styles.taxDiscountToggle} ${pricingOfferForm.discount.type === 'percent' ? styles.active : ''}`}
-                          onClick={() => updatePricingOfferDiscount('type', 'percent')}
-                        >
-                          %
-                        </button>
-                        <button
-                          type="button"
-                          className={`${styles.taxDiscountToggle} ${pricingOfferForm.discount.type === 'fixed' ? styles.active : ''}`}
-                          onClick={() => updatePricingOfferDiscount('type', 'fixed')}
-                        >
-                          $
-                        </button>
-                      </div>
-                      <span className={styles.summaryLabel}>İndirim</span>
-                      <button
-                        type="button"
-                        className={styles.removeTaxDiscountButton}
-                        onClick={() => updatePricingOfferDiscount('enabled', false)}
-                      >
-                        🗑️
-                      </button>
-                      <div className={styles.taxDiscountInput}>
-                        <input
-                          type="number"
-                          value={pricingOfferForm.discount.value}
-                          onChange={(e) => updatePricingOfferDiscount('value', e.target.value)}
-                          placeholder="0"
-                          step="0.01"
-                        />
-                        <span className={styles.taxDiscountSymbol}>{pricingOfferForm.discount.type === 'percent' ? '%' : '$'}</span>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {!pricingOfferForm.discount.enabled && (
-                    <button
-                      type="button"
-                      className={styles.addDiscountButton}
-                      onClick={() => updatePricingOfferDiscount('enabled', true)}
-                    >
-                      + İndirim
-                    </button>
-                  )}
-                </div>
+              {/* Notes Section */}
+              <div className={styles.notesSection}>
+                <label>
+                  <span>Ekstra Notlar</span>
+                  <textarea
+                    value={pricingOfferForm.notes}
+                    onChange={(e) =>
+                      setPricingOfferForm((prev) => ({ ...prev, notes: e.target.value }))
+                    }
+                    rows={4}
+                    placeholder="Add any additional notes or comments..."
+                  />
+                </label>
               </div>
 
             </div>
@@ -922,13 +846,11 @@ export default function PdfGenerationPage() {
               <div className={styles.topRightDates}>
                 <div className={styles.dateField}>
                   <label className={styles.dateLabel}>Tarih</label>
-                  <input
-                    type="date"
+                  <DateInput
                     value={invoiceForm.date}
-                    onChange={(e) =>
-                      setInvoiceForm((prev) => ({ ...prev, date: e.target.value }))
+                    onChange={(value) =>
+                      setInvoiceForm((prev) => ({ ...prev, date: value }))
                     }
-                    className={styles.dateInput}
                     required
                   />
                 </div>
@@ -1045,7 +967,7 @@ export default function PdfGenerationPage() {
                       </div>
                       <div className={styles.itemPrice}>
                         <div className={styles.priceInputWrapper}>
-                          <span className={styles.currencySymbol}>$</span>
+                          <span className={styles.currencySymbol}>₺</span>
                           <input
                             className={styles.itemInput}
                             type="text"
@@ -1127,7 +1049,7 @@ export default function PdfGenerationPage() {
                           className={`${styles.taxDiscountToggle} ${invoiceForm.tax.type === 'fixed' ? styles.active : ''}`}
                           onClick={() => updateTax('type', 'fixed')}
                         >
-                          $
+                          ₺
                         </button>
                       </div>
                       <span className={styles.summaryLabel}>Vergi</span>
@@ -1146,7 +1068,7 @@ export default function PdfGenerationPage() {
                           placeholder="0"
                           step="0.01"
                         />
-                        <span className={styles.taxDiscountSymbol}>{invoiceForm.tax.type === 'percent' ? '%' : '$'}</span>
+                        <span className={styles.taxDiscountSymbol}>{invoiceForm.tax.type === 'percent' ? '%' : '₺'}</span>
                       </div>
                     </div>
                   )}
@@ -1176,7 +1098,7 @@ export default function PdfGenerationPage() {
                           className={`${styles.taxDiscountToggle} ${invoiceForm.discount.type === 'fixed' ? styles.active : ''}`}
                           onClick={() => updateDiscount('type', 'fixed')}
                         >
-                          $
+                          ₺
                         </button>
                       </div>
                       <span className={styles.summaryLabel}>İndirim</span>
@@ -1195,7 +1117,7 @@ export default function PdfGenerationPage() {
                           placeholder="0"
                           step="0.01"
                         />
-                        <span className={styles.taxDiscountSymbol}>{invoiceForm.discount.type === 'percent' ? '%' : '$'}</span>
+                        <span className={styles.taxDiscountSymbol}>{invoiceForm.discount.type === 'percent' ? '%' : '₺'}</span>
                       </div>
                     </div>
                   )}
