@@ -48,8 +48,14 @@ jobs:
       - name: Create deployment package
         working-directory: ./backend
         run: |
-          zip -r erp-backend-deploy.zip dist/ package.json package-lock.json \
-            -x "*.map" "*.tsbuildinfo" "node_modules/*"
+          # Include package-lock.json if it exists, otherwise just package.json
+          if [ -f package-lock.json ]; then
+            zip -r erp-backend-deploy.zip dist/ package.json package-lock.json \
+              -x "*.map" "*.tsbuildinfo" "node_modules/*"
+          else
+            zip -r erp-backend-deploy.zip dist/ package.json \
+              -x "*.map" "*.tsbuildinfo" "node_modules/*"
+          fi
 
       - name: Upload to S3
         run: |
