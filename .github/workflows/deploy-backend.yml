@@ -32,11 +32,18 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./backend
-        run: npm install
+        run: |
+          echo "📦 Installing dependencies..."
+          npm install
+          echo "✅ Dependencies installed"
 
       - name: Build backend
         working-directory: ./backend
-        run: npm run build
+        run: |
+          echo "🔨 Building backend..."
+          npm run build
+          echo "✅ Build completed"
+          ls -la dist/ || echo "⚠️ dist/ directory check"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -48,27 +55,67 @@ jobs:
       - name: Create deployment package
         working-directory: ./backend
         run: |
+          echo "📦 Creating deployment package..."
+          # Check if dist directory exists
+          if [ ! -d "dist" ]; then
+            echo "❌ Error: dist/ directory not found!"
+            exit 1
+          fi
+          
+          # Check if package.json exists
+          if [ ! -f "package.json" ]; then
+            echo "❌ Error: package.json not found!"
+            exit 1
+          fi
+          
           # Include package-lock.json if it exists, otherwise just package.json
           if [ -f package-lock.json ]; then
+            echo "📄 Including package-lock.json"
             zip -r erp-backend-deploy.zip dist/ package.json package-lock.json \
               -x "*.map" "*.tsbuildinfo" "node_modules/*"
           else
+            echo "📄 Using package.json only"
             zip -r erp-backend-deploy.zip dist/ package.json \
               -x "*.map" "*.tsbuildinfo" "node_modules/*"
           fi
+          
+          # Verify zip was created
+          if [ ! -f "erp-backend-deploy.zip" ]; then
+            echo "❌ Error: Failed to create deployment package!"
+            exit 1
+          fi
+          
+          echo "✅ Deployment package created: $(ls -lh erp-backend-deploy.zip)"
 
       - name: Upload to S3
         run: |
+          echo "📤 Uploading to S3..."
           S3_KEY="erp-backend-deploy-$(date +%Y%m%d-%H%M%S)-${GITHUB_SHA:0:7}.zip"
           echo "S3_KEY=$S3_KEY" >> $GITHUB_ENV
+          
+          # Verify zip exists before uploading
+          if [ ! -f "backend/erp-backend-deploy.zip" ]; then
+            echo "❌ Error: Deployment package not found!"
+            exit 1
+          fi
+          
           aws s3 cp backend/erp-backend-deploy.zip \
             s3://${{ env.S3_BUCKET }}/$S3_KEY \
             --region ${{ env.AWS_REGION }}
+          
+          if [ $? -ne 0 ]; then
+            echo "❌ Error: Failed to upload to S3!"
+            exit 1
+          fi
+          
+          echo "✅ Uploaded to S3: $S3_KEY"
 
       - name: Create EB application version
         run: |
+          echo "📦 Creating EB application version..."
           VERSION_LABEL="deploy-$(date +%Y%m%d-%H%M%S)-${GITHUB_SHA:0:7}"
           echo "VERSION_LABEL=$VERSION_LABEL" >> $GITHUB_ENV
+          
           aws elasticbeanstalk create-application-version \
             --region ${{ env.AWS_REGION }} \
             --application-name "${{ env.EB_APPLICATION_NAME }}" \
@@ -76,14 +123,29 @@ jobs:
             --source-bundle S3Bucket="${{ env.S3_BUCKET }}",S3Key="${{ env.S3_KEY }}" \
             --description "Deployment from GitHub - ${GITHUB_SHA:0:7} - ${GITHUB_ACTOR}" \
             --output text --query 'ApplicationVersion.VersionLabel'
+          
+          if [ $? -ne 0 ]; then
+            echo "❌ Error: Failed to create EB application version!"
+            exit 1
+          fi
+          
+          echo "✅ Created version: $VERSION_LABEL"
 
       - name: Deploy to Elastic Beanstalk
         run: |
+          echo "🚀 Deploying to Elastic Beanstalk..."
           aws elasticbeanstalk update-environment \
             --region ${{ env.AWS_REGION }} \
             --environment-name "${{ env.EB_ENVIRONMENT_NAME }}" \
             --version-label "${{ env.VERSION_LABEL }}" \
             --output text --query 'EnvironmentId'
+          
+          if [ $? -ne 0 ]; then
+            echo "❌ Error: Failed to deploy to Elastic Beanstalk!"
+            exit 1
+          fi
+          
+          echo "✅ Deployment initiated"
 
       - name: Wait for deployment
         run: |
