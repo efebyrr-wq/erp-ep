@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Tabs } from '../components/common/Tabs';
 import { DateInput } from '../components/common/DateInput';
 import { apiGet } from '../lib/api';
-import { convertDDMMYYYYToYYYYMMDD, convertYYYYMMDDToDDMMYYYY } from '../lib/dateUtils';
+import { convertYYYYMMDDToDDMMYYYY } from '../lib/dateUtils';
 import type { Customer } from '../types';
 import styles from './PdfGenerationPage.module.css';
 import html2canvas from 'html2canvas';
@@ -213,15 +213,35 @@ export default function PdfGenerationPage() {
         textareaReplacements.push({ textarea, replacement: div });
       });
 
+      // Wait for all images to load before capturing
+      const images = formElement.querySelectorAll('img');
+      await Promise.all(
+        Array.from(images).map((img) => {
+          if (img.complete) return Promise.resolve();
+          return new Promise<void>((resolve) => {
+            img.onload = () => resolve();
+            img.onerror = () => {
+              console.warn('Image failed to load:', img.src);
+              resolve(); // Continue even if image fails
+            };
+            // Timeout after 5 seconds
+            setTimeout(() => resolve(), 5000);
+          });
+        })
+      );
+
       // Capture the form as canvas with high quality
       const scale = 2; // Higher scale for better quality
       const canvas = await html2canvas(formElement, {
         scale: scale,
         useCORS: true,
+        allowTaint: false,
         logging: false,
         backgroundColor: '#ffffff',
         width: formElement.scrollWidth,
         height: formElement.scrollHeight,
+        imageTimeout: 15000, // 15 second timeout for images
+        removeContainer: false,
       });
 
       // A4 dimensions in mm
@@ -278,13 +298,43 @@ export default function PdfGenerationPage() {
             0, sourceY, canvas.width, sourceHeight,
             0, 0, canvas.width, sourceHeight
           );
-          const pageImgData = pageCanvas.toDataURL('image/png', 1.0);
+          
+          // Validate canvas before converting to data URL
+          if (pageCanvas.width === 0 || pageCanvas.height === 0) {
+            console.warn(`Skipping empty page canvas at index ${i}`);
+            continue;
+          }
+          
+          let pageImgData: string;
+          try {
+            pageImgData = pageCanvas.toDataURL('image/png', 1.0);
+            
+            // Validate the data URL
+            if (!pageImgData || pageImgData === 'data:,') {
+              console.warn(`Invalid data URL for page ${i}, skipping`);
+              continue;
+            }
+          } catch (error) {
+            console.error(`Error converting canvas to data URL for page ${i}:`, error);
+            continue;
+          }
           
           // Calculate display height in mm for this page (accounting for canvas scale)
           const displayHeightMm = (sourceHeight / scale) / pixelsPerMm * scaleFactor;
           
           // Add image at exact A4 width (210mm), preserving all relative spacing
-          pdf.addImage(pageImgData, 'PNG', 0, 0, a4Width, displayHeightMm);
+          try {
+            pdf.addImage(pageImgData, 'PNG', 0, 0, a4Width, displayHeightMm);
+          } catch (error) {
+            console.error(`Error adding image to PDF for page ${i}:`, error);
+            // Try with JPEG as fallback
+            try {
+              const jpegData = pageCanvas.toDataURL('image/jpeg', 0.95);
+              pdf.addImage(jpegData, 'JPEG', 0, 0, a4Width, displayHeightMm);
+            } catch (jpegError) {
+              console.error(`Error adding JPEG fallback for page ${i}:`, jpegError);
+            }
+          }
         }
       }
 
@@ -364,27 +414,7 @@ export default function PdfGenerationPage() {
     });
   };
 
-  const updatePricingOfferTax = (field: 'type' | 'value' | 'enabled', value: string | boolean) => {
-    setPricingOfferForm((prev) => {
-      const newForm = {
-        ...prev,
-        tax: { ...prev.tax, [field]: value },
-      };
-      const { subtotal, balanceDue } = calculateBalanceDueForPricingOffer(newForm);
-      return { ...newForm, subtotal, balanceDue };
-    });
-  };
-
-  const updatePricingOfferDiscount = (field: 'type' | 'value' | 'enabled', value: string | boolean) => {
-    setPricingOfferForm((prev) => {
-      const newForm = {
-        ...prev,
-        discount: { ...prev.discount, [field]: value },
-      };
-      const { subtotal, balanceDue } = calculateBalanceDueForPricingOffer(newForm);
-      return { ...newForm, subtotal, balanceDue };
-    });
-  };
+  // Removed updatePricingOfferTax and updatePricingOfferDiscount - not used (tax/discount removed from pricing offer form)
 
   const addInvoiceItem = () => {
     setInvoiceForm((prev) => ({

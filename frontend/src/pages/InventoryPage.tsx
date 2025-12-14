@@ -6,7 +6,6 @@ import { Modal } from '../components/common/Modal';
 import { DateTimeInput } from '../components/common/DateTimeInput';
 import { apiGet } from '../lib/api';
 import { convertDDMMYYYYHHMMToISO, convertISOToDDMMYYYYHHMM } from '../lib/dateTimeUtils';
-import { mockInventory } from '../lib/mockData';
 import type { InventoryItem, Supplier, Supply } from '../types';
 import styles from './InventoryPage.module.css';
 
@@ -63,15 +62,20 @@ export default function InventoryPage() {
       const matchesReference = filter.reference
         ? item.referenceBillId?.toString().includes(filter.reference)
         : true;
-      const usedAt = item.usedAt ? new Date(item.usedAt) : null;
-      const matchesSince = filter.since
-        ? usedAt
-          ? usedAt >= new Date(filter.since)
+      
+      // Convert filter dates from DD/MM/YYYY HH:MM to ISO for comparison
+      const itemUsedAt = item.usedAt ? new Date(item.usedAt) : null;
+      const filterSince = filter.since ? new Date(convertDDMMYYYYHHMMToISO(filter.since)) : null;
+      const filterUntil = filter.until ? new Date(convertDDMMYYYYHHMMToISO(filter.until)) : null;
+      
+      const matchesSince = filterSince
+        ? itemUsedAt
+          ? itemUsedAt >= filterSince
           : false
         : true;
-      const matchesUntil = filter.until
-        ? usedAt
-          ? usedAt <= new Date(filter.until)
+      const matchesUntil = filterUntil
+        ? itemUsedAt
+          ? itemUsedAt <= filterUntil
           : false
         : true;
       return matchesReference && matchesSince && matchesUntil;
