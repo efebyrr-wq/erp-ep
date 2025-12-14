@@ -4,7 +4,9 @@ import { FilterBar } from '../components/common/FilterBar';
 import { Modal } from '../components/common/Modal';
 import { Drawer } from '../components/common/Drawer';
 import { MachineryMap } from '../components/map/MachineryMap';
+import { DateTimeInput } from '../components/common/DateTimeInput';
 import { apiDelete, apiGet, apiPatch, apiPost } from '../lib/api';
+import { convertDDMMYYYYHHMMToISO, convertISOToDDMMYYYYHHMM } from '../lib/dateTimeUtils';
 import { mockMachinery } from '../lib/mockData';
 import type {
   Machinery,
@@ -245,8 +247,8 @@ export default function MachineryPage() {
         ? {
             plateNumber: vehicle.plateNumber ?? '',
             vehicleType: vehicle.vehicleType ?? '',
-            examinationDate: vehicle.examinationDate ?? '',
-            insuranceDate: vehicle.insuranceDate ?? '',
+            examinationDate: vehicle.examinationDate ? convertISOToDDMMYYYYHHMM(vehicle.examinationDate) : '',
+            insuranceDate: vehicle.insuranceDate ? convertISOToDDMMYYYYHHMM(vehicle.insuranceDate) : '',
           }
         : defaultVehicleForm,
     );
@@ -424,8 +426,8 @@ export default function MachineryPage() {
     const payload = {
       plateNumber: vehicleFormState.plateNumber.trim() || null,
       vehicleType: vehicleFormState.vehicleType.trim() || null,
-      examinationDate: vehicleFormState.examinationDate.trim() || null,
-      insuranceDate: vehicleFormState.insuranceDate.trim() || null,
+      examinationDate: vehicleFormState.examinationDate.trim() ? convertDDMMYYYYHHMMToISO(vehicleFormState.examinationDate.trim()) : null,
+      insuranceDate: vehicleFormState.insuranceDate.trim() ? convertDDMMYYYYHHMMToISO(vehicleFormState.insuranceDate.trim()) : null,
     };
 
     const result = selectedVehicle
@@ -669,21 +671,19 @@ export default function MachineryPage() {
           </label>
           <label>
             <span>Examination Date</span>
-            <input
-              type="date"
+            <DateTimeInput
               value={vehicleFormState.examinationDate}
-              onChange={(event) =>
-                setVehicleFormState((prev) => ({ ...prev, examinationDate: event.target.value }))
+              onChange={(value) =>
+                setVehicleFormState((prev) => ({ ...prev, examinationDate: value }))
               }
             />
           </label>
           <label>
             <span>Insurance Date</span>
-            <input
-              type="date"
+            <DateTimeInput
               value={vehicleFormState.insuranceDate}
-              onChange={(event) =>
-                setVehicleFormState((prev) => ({ ...prev, insuranceDate: event.target.value }))
+              onChange={(value) =>
+                setVehicleFormState((prev) => ({ ...prev, insuranceDate: value }))
               }
             />
           </label>

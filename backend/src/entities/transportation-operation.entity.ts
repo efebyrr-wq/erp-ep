@@ -17,7 +17,7 @@ export class TransportationOperation {
   @Column({ name: 'ending_loc', type: 'text', nullable: true })
   endingLoc!: string | null;
 
-  @Column({ name: 'date', type: 'date', nullable: true })
+  @Column({ name: 'date', type: 'timestamp', nullable: true })
   operationDate!: string | null;
 
   @Column({ name: 'notes', type: 'text', nullable: true })

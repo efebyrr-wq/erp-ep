@@ -23,15 +23,6 @@ export class OutsourceInvoiceLine {
   @Column({ name: 'outsourcer_name', type: 'text', nullable: true })
   outsourcerName!: string | null;
 
-  @Column({ name: 'customer_name', type: 'text', nullable: true })
-  customerName!: string | null;
-
-  @Column({ name: 'machine_code', type: 'text', nullable: true })
-  machineCode!: string | null;
-
-  @Column({ name: 'working_site_name', type: 'text', nullable: true })
-  workingSiteName!: string | null;
-
   @Column({ type: 'text', nullable: true })
   type!: string | null;
 
@@ -46,12 +37,6 @@ export class OutsourceInvoiceLine {
 
   @Column({ name: 'total_price', type: 'numeric', nullable: true })
   totalPrice!: string | null;
-
-  @Column({ name: 'start_date', type: 'date', nullable: true })
-  startDate!: string | null;
-
-  @Column({ name: 'end_date', type: 'date', nullable: true })
-  endDate!: string | null;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz', default: () => 'now()' })
   createdAt!: Date;

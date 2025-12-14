@@ -92,16 +92,11 @@ export class InvoicesService {
               billId: saved.id,
               outsourceOperationId: line.operationId ?? null,
               outsourcerName: dto.supplierOutsourcerName,
-              customerName: line.customerName ?? outsourceOp?.customerName ?? null,
-              machineCode: line.machineCode ?? outsourceOp?.machineCode ?? null,
-              workingSiteName: line.workingSiteName ?? outsourceOp?.workingSiteName ?? null,
               type: line.type ?? null,
               details: line.details ?? null,
               unitPrice: line.unitPrice ?? null,
               amount: line.amount ?? null,
               totalPrice: line.totalPrice ?? null,
-              startDate: line.startDate ?? outsourceOp?.startDate ?? null,
-              endDate: line.endDate ?? outsourceOp?.endDate ?? null,
             });
           }),
         );
@@ -296,16 +291,11 @@ export class InvoicesService {
                 billId: updated.id,
                 outsourceOperationId: line.operationId ?? null,
                 outsourcerName: updated.supplierOutsourcerName,
-                customerName: line.customerName ?? outsourceOp?.customerName ?? null,
-                machineCode: line.machineCode ?? outsourceOp?.machineCode ?? null,
-                workingSiteName: line.workingSiteName ?? outsourceOp?.workingSiteName ?? null,
                 type: line.type ?? null,
                 details: line.details ?? null,
                 unitPrice: line.unitPrice ?? null,
                 amount: line.amount ?? null,
                 totalPrice: line.totalPrice ?? null,
-                startDate: line.startDate ?? outsourceOp?.startDate ?? null,
-                endDate: line.endDate ?? outsourceOp?.endDate ?? null,
               });
             }),
           );

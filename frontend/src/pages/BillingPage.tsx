@@ -3,7 +3,9 @@ import type { FormEvent } from 'react';
 import { DataTable } from '../components/common/DataTable';
 import { Modal } from '../components/common/Modal';
 import { Tabs } from '../components/common/Tabs';
+import { DateTimeInput } from '../components/common/DateTimeInput';
 import { apiGet } from '../lib/api';
+import { convertDDMMYYYYHHMMToISO, convertISOToDDMMYYYYHHMM } from '../lib/dateTimeUtils';
 import { mockBills, mockInvoices } from '../lib/mockData';
 import type { Bill, Invoice, Customer, InternalOperation, OutsourceOperation, Supplier, Supply, Outsourcer } from '../types';
 import styles from './BillingPage.module.css';
@@ -40,12 +42,6 @@ type InvoiceForm = {
     amount: string;
     operationId?: string;
     supplyId?: string; // Added supplyId to track selected supply
-    // Outsource invoice line fields
-    customerName?: string;
-    machineCode?: string;
-    workingSiteName?: string;
-    startDate?: string;
-    endDate?: string;
   }[];
 };
 
@@ -177,18 +173,15 @@ export default function BillingPage() {
           // Check if this is a rental line (has startDate/endDate)
           const isRental = !!(line.startDate || line.endDate);
           
-          // Format dates properly for date inputs (YYYY-MM-DD format)
+          // Format dates properly for DateTimeInput (DD/MM/YYYY HH:MM format)
           let formattedStartDate = '';
           let formattedEndDate = '';
           
           if (isRental) {
             if (line.startDate) {
               try {
-                // Handle ISO date string (e.g., "2025-11-11T21:00:00.000Z")
-                const startDateStr = String(line.startDate);
-                // Extract just the date part (YYYY-MM-DD)
-                const dateMatch = startDateStr.match(/^(\d{4}-\d{2}-\d{2})/);
-                formattedStartDate = dateMatch ? dateMatch[1] : '';
+                // Convert ISO date string to DD/MM/YYYY HH:MM
+                formattedStartDate = convertISOToDDMMYYYYHHMM(String(line.startDate));
                 console.log(`Parsed startDate: "${line.startDate}" -> "${formattedStartDate}"`);
               } catch (error) {
                 console.error('Error parsing startDate:', error, line.startDate);
@@ -197,9 +190,8 @@ export default function BillingPage() {
             }
             if (line.endDate) {
               try {
-                const endDateStr = String(line.endDate);
-                const dateMatch = endDateStr.match(/^(\d{4}-\d{2}-\d{2})/);
-                formattedEndDate = dateMatch ? dateMatch[1] : '';
+                // Convert ISO date string to DD/MM/YYYY HH:MM
+                formattedEndDate = convertISOToDDMMYYYYHHMM(String(line.endDate));
                 console.log(`Parsed endDate: "${line.endDate}" -> "${formattedEndDate}"`);
               } catch (error) {
                 console.error('Error parsing endDate:', error, line.endDate);
@@ -235,7 +227,7 @@ export default function BillingPage() {
       
       setBillWithLinesForm({
         customerName: billWithLines.customerName || '',
-        billDate: billWithLines.billDate ? billWithLines.billDate.split('T')[0] : '',
+        billDate: billWithLines.billDate ? convertISOToDDMMYYYYHHMM(billWithLines.billDate) : '',
         taxed: billWithLines.taxed ?? false,
         lines: formLines,
       });
@@ -269,7 +261,7 @@ export default function BillingPage() {
       setInvoiceForm({
         supplierOutsourcerName: invoice.supplierOutsourcerName ?? '',
         totalAmount: invoice.totalAmount ?? '',
-        billDate: invoice.billDate ?? '',
+        billDate: invoice.billDate ? convertISOToDDMMYYYYHHMM(invoice.billDate) : '',
         taxed: invoice.taxed ?? false,
         lines: [], // lines will be fetched/attached later if needed
       });
@@ -280,7 +272,7 @@ export default function BillingPage() {
         totalAmount: '0.00',
         billDate: '',
         taxed: false,
-        lines: [{ type: '', details: '', unitPrice: '', amount: '', operationId: '', supplyId: '', customerName: '', machineCode: '', workingSiteName: '', startDate: '', endDate: '' }],
+        lines: [{ type: '', details: '', unitPrice: '', amount: '', operationId: '', supplyId: '' }],
       });
     }
     setInvoiceModalOpen(true);
@@ -288,7 +280,7 @@ export default function BillingPage() {
   const addInvoiceLine = () => {
     setInvoiceForm((prev) => ({
       ...prev,
-      lines: [...(prev.lines ?? []), { type: '', details: '', unitPrice: '', amount: '', operationId: '', supplyId: '', customerName: '', machineCode: '', workingSiteName: '', startDate: '', endDate: '' }],
+      lines: [...(prev.lines ?? []), { type: '', details: '', unitPrice: '', amount: '', operationId: '', supplyId: '' }],
     }));
   };
   const removeInvoiceLine = (index: number) => {
@@ -299,7 +291,7 @@ export default function BillingPage() {
   };
   const updateInvoiceLine = (
     index: number,
-    field: 'type' | 'details' | 'unitPrice' | 'amount' | 'operationId' | 'supplyId' | 'customerName' | 'machineCode' | 'workingSiteName' | 'startDate' | 'endDate',
+    field: 'type' | 'details' | 'unitPrice' | 'amount' | 'operationId' | 'supplyId',
     value: string,
   ) => {
     setInvoiceForm((prev) => {
@@ -423,10 +415,12 @@ export default function BillingPage() {
           // If user checks closeOperation, set today's date as endDate
           if (field === 'closeOperation' && value === true) {
             const today = new Date();
-            const yyyy = today.getFullYear();
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
             const dd = String(today.getDate()).padStart(2, '0');
-            updated.endDate = `${yyyy}-${mm}-${dd}`;
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const yyyy = today.getFullYear();
+            const hh = String(today.getHours()).padStart(2, '0');
+            const min = String(today.getMinutes()).padStart(2, '0');
+            updated.endDate = `${dd}/${mm}/${yyyy} ${hh}:${min}`;
           }
           return updated;
         }
@@ -456,8 +450,8 @@ export default function BillingPage() {
       unitPrice: line.unitPrice || null,
       amount: line.amount || null,
       operationId: line.operationId || null,
-      startDate: line.startDate || null,
-      endDate: line.endDate || null,
+      startDate: line.startDate ? convertDDMMYYYYHHMMToISO(line.startDate) : null,
+      endDate: line.endDate ? convertDDMMYYYYHHMMToISO(line.endDate) : null,
     }));
 
     // Save bill to database via API FIRST
@@ -465,7 +459,7 @@ export default function BillingPage() {
       const payload = {
         customerName: billWithLinesForm.customerName || null,
         totalAmount: totalAmount,
-        billDate: billWithLinesForm.billDate || null,
+        billDate: billWithLinesForm.billDate ? convertDDMMYYYYHHMMToISO(billWithLinesForm.billDate) : null,
         taxed: billWithLinesForm.taxed,
         lines: billLines,
       };
@@ -592,6 +586,13 @@ export default function BillingPage() {
       return;
     }
 
+    // Convert billDate from DD/MM/YYYY HH:MM to ISO for backend
+    const billDateForBackend = convertDDMMYYYYHHMMToISO(invoiceForm.billDate);
+    if (!billDateForBackend) {
+      alert('Please enter a valid bill date.');
+      return;
+    }
+
     // Always compute total from lines to ensure accuracy
     const computedTotal = computeInvoiceTotal();
     if (parseFloat(computedTotal) <= 0) {
@@ -607,7 +608,7 @@ export default function BillingPage() {
     const payload = {
       supplierOutsourcerName: invoiceForm.supplierOutsourcerName.trim(),
       totalAmount: computedTotal,
-      billDate: invoiceForm.billDate,
+      billDate: billDateForBackend,
       taxed: invoiceForm.taxed || false,
       lines: validLines.length > 0 ? validLines.map((l) => ({
         type: l.type && l.type.trim() ? l.type.trim() : null,
@@ -619,12 +620,6 @@ export default function BillingPage() {
           l.unitPrice && l.amount
             ? String((parseFloat(l.unitPrice) * parseFloat(l.amount)).toFixed(2))
             : null,
-        // Outsource invoice line fields
-        customerName: l.customerName && l.customerName.trim() ? l.customerName.trim() : null,
-        machineCode: l.machineCode && l.machineCode.trim() ? l.machineCode.trim() : null,
-        workingSiteName: l.workingSiteName && l.workingSiteName.trim() ? l.workingSiteName.trim() : null,
-        startDate: l.startDate && l.startDate.trim() ? l.startDate.trim() : null,
-        endDate: l.endDate && l.endDate.trim() ? l.endDate.trim() : null,
       })) : undefined,
     };
 
@@ -962,11 +957,10 @@ export default function BillingPage() {
               </label>
               <label>
                 <span>Bill Date</span>
-                <input
-                  type="date"
+                <DateTimeInput
                   value={billWithLinesForm.billDate}
-                  onChange={(e) =>
-                    setBillWithLinesForm((prev) => ({ ...prev, billDate: e.target.value }))
+                  onChange={(value) =>
+                    setBillWithLinesForm((prev) => ({ ...prev, billDate: value }))
                   }
                   required
                 />
@@ -1058,34 +1052,18 @@ export default function BillingPage() {
                     <>
                       <label>
                         <span>Start Date</span>
-                        <input
-                          type="date"
-                          value={(() => {
-                            if (!line.startDate) return '';
-                            const dateStr = String(line.startDate);
-                            // Extract YYYY-MM-DD format
-                            const match = dateStr.match(/^(\d{4}-\d{2}-\d{2})/);
-                            return match ? match[1] : '';
-                          })()}
-                          onChange={(e) => updateBillLine(index, 'startDate', e.target.value)}
+                        <DateTimeInput
+                          value={line.startDate || ''}
+                          onChange={(value) => updateBillLine(index, 'startDate', value)}
                           required={isRentalType(line.type)}
-                          lang="en"
                         />
                       </label>
                       <label>
                         <span>End Date</span>
-                        <input
-                          type="date"
-                          value={(() => {
-                            if (!line.endDate) return '';
-                            const dateStr = String(line.endDate);
-                            // Extract YYYY-MM-DD format
-                            const match = dateStr.match(/^(\d{4}-\d{2}-\d{2})/);
-                            return match ? match[1] : '';
-                          })()}
-                          onChange={(e) => updateBillLine(index, 'endDate', e.target.value)}
+                        <DateTimeInput
+                          value={line.endDate || ''}
+                          onChange={(value) => updateBillLine(index, 'endDate', value)}
                           required={isRentalType(line.type)}
-                          lang="en"
                         />
                       </label>
                     </>
@@ -1148,7 +1126,7 @@ export default function BillingPage() {
               </div>
 
               <div className={styles.totalSection}>
-                <strong>Total Amount: ${calculateTotalAmount.toFixed(2)}</strong>
+                <strong>Total Amount: ₺{calculateTotalAmount.toFixed(2)}</strong>
               </div>
             </div>
 
@@ -1219,11 +1197,10 @@ export default function BillingPage() {
               </label>
               <label>
                 <span>Bill Date</span>
-                <input
-                  type="date"
+                <DateTimeInput
                   value={invoiceForm.billDate}
-                  onChange={(e) =>
-                    setInvoiceForm((prev) => ({ ...prev, billDate: e.target.value }))
+                  onChange={(value) =>
+                    setInvoiceForm((prev) => ({ ...prev, billDate: value }))
                   }
                   required
                 />
@@ -1302,38 +1279,28 @@ export default function BillingPage() {
                             value={line.operationId ?? ''}
                             onChange={(e) => {
                               updateInvoiceLine(index, 'operationId', e.target.value);
-                              // Auto-fill all fields from operation if selected
+                              // Auto-fill details from operation if selected
                               if (e.target.value) {
                                 const selectedOp = activeOutsourceOps.find(op => op.id === e.target.value);
                                 if (selectedOp) {
-                                  // Auto-fill all outsource invoice line fields
+                                  // Auto-fill details from operation
                                   setInvoiceForm((prev) => {
                                     const newLines = [...(prev.lines ?? [])];
                                     newLines[index] = {
                                       ...newLines[index],
                                       operationId: e.target.value,
-                                      customerName: selectedOp.customerName || '',
-                                      machineCode: selectedOp.machineCode || '',
-                                      workingSiteName: selectedOp.workingSiteName || '',
-                                      startDate: selectedOp.startDate ? selectedOp.startDate.split('T')[0] : '',
-                                      endDate: selectedOp.endDate ? selectedOp.endDate.split('T')[0] : '',
                                       details: `${selectedOp.customerName || ''} - ${selectedOp.machineCode || ''} - ${selectedOp.workingSiteName || ''}`.trim() || newLines[index].details,
                                     };
                                     return { ...prev, lines: newLines };
                                   });
                                 }
                               } else {
-                                // Clear fields if no operation selected
+                                // Clear operation ID if no operation selected
                                 setInvoiceForm((prev) => {
                                   const newLines = [...(prev.lines ?? [])];
                                   newLines[index] = {
                                     ...newLines[index],
                                     operationId: '',
-                                    customerName: '',
-                                    machineCode: '',
-                                    workingSiteName: '',
-                                    startDate: '',
-                                    endDate: '',
                                   };
                                   return { ...prev, lines: newLines };
                                 });
@@ -1353,46 +1320,6 @@ export default function BillingPage() {
                                 </option>
                               ))}
                           </select>
-                        </label>
-                        <label>
-                          <span>Customer Name</span>
-                          <input
-                            value={line.customerName ?? ''}
-                            onChange={(e) => updateInvoiceLine(index, 'customerName', e.target.value)}
-                            placeholder="Customer name"
-                      />
-                    </label>
-                        <label>
-                          <span>Machine Code</span>
-                          <input
-                            value={line.machineCode ?? ''}
-                            onChange={(e) => updateInvoiceLine(index, 'machineCode', e.target.value)}
-                            placeholder="Machine code"
-                          />
-                        </label>
-                        <label>
-                          <span>Working Site Name</span>
-                          <input
-                            value={line.workingSiteName ?? ''}
-                            onChange={(e) => updateInvoiceLine(index, 'workingSiteName', e.target.value)}
-                            placeholder="Working site name"
-                          />
-                        </label>
-                        <label>
-                          <span>Start Date</span>
-                          <input
-                            type="date"
-                            value={line.startDate ?? ''}
-                            onChange={(e) => updateInvoiceLine(index, 'startDate', e.target.value)}
-                          />
-                        </label>
-                        <label>
-                          <span>End Date</span>
-                          <input
-                            type="date"
-                            value={line.endDate ?? ''}
-                            onChange={(e) => updateInvoiceLine(index, 'endDate', e.target.value)}
-                          />
                         </label>
                       </>
                     )}
@@ -1494,7 +1421,7 @@ export default function BillingPage() {
               </div>
 
               <div className={styles.totalSection}>
-                <strong>Total Amount: ${computeInvoiceTotal()}</strong>
+                <strong>Total Amount: ₺{computeInvoiceTotal()}</strong>
               </div>
             </div>
 

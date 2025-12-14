@@ -7,8 +7,9 @@ type TopbarProps = {
 };
 
 export function Topbar({ onToggleSidebar }: TopbarProps) {
-  const { logout } = useAuth();
   const navigate = useNavigate();
+  const auth = useAuth();
+  const { logout } = auth;
 
   const handleLogout = () => {
     logout();

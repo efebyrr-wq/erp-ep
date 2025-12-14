@@ -17,10 +17,10 @@ export class InternalOperation {
   @Column({ name: 'working_site_name', type: 'text', nullable: true })
   workingSiteName!: string | null;
 
-  @Column({ name: 'start_date', type: 'date', nullable: true })
+  @Column({ name: 'start_date', type: 'timestamp', nullable: true })
   startDate!: string | null;
 
-  @Column({ name: 'end_date', type: 'date', nullable: true })
+  @Column({ name: 'end_date', type: 'timestamp', nullable: true })
   endDate!: string | null;
 }
 

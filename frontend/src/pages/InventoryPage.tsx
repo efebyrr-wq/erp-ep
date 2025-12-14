@@ -3,7 +3,9 @@ import type { FormEvent } from 'react';
 import { DataTable } from '../components/common/DataTable';
 import { FilterBar } from '../components/common/FilterBar';
 import { Modal } from '../components/common/Modal';
+import { DateTimeInput } from '../components/common/DateTimeInput';
 import { apiGet } from '../lib/api';
+import { convertDDMMYYYYHHMMToISO, convertISOToDDMMYYYYHHMM } from '../lib/dateTimeUtils';
 import { mockInventory } from '../lib/mockData';
 import type { InventoryItem, Supplier, Supply } from '../types';
 import styles from './InventoryPage.module.css';
@@ -78,6 +80,7 @@ export default function InventoryPage() {
   const openForm = (item?: InventoryItem) => {
     setSelectedItem(item ?? null);
     setSelectedSupplyId(item?.referenceBillId ?? '');
+    setUsedAt(item?.usedAt ? convertISOToDDMMYYYYHHMM(item.usedAt) : '');
     setFormModalOpen(true);
   };
 
@@ -89,7 +92,7 @@ export default function InventoryPage() {
       itemName: (formData.get('itemName') as string) ?? '',
       quantity: Number(formData.get('quantity') ?? 0),
       referenceBillId: selectedSupplyId || null,
-      usedAt: (formData.get('usedAt') as string) || null,
+      usedAt: usedAt ? convertDDMMYYYYHHMMToISO(usedAt) : null,
     };
 
     setItems((prev) => {
@@ -129,15 +132,13 @@ export default function InventoryPage() {
             setFilter((prev) => ({ ...prev, reference: event.target.value }))
           }
         />
-        <input
-          type="date"
+        <DateTimeInput
           value={filter.since}
-          onChange={(event) => setFilter((prev) => ({ ...prev, since: event.target.value }))}
+          onChange={(value) => setFilter((prev) => ({ ...prev, since: value }))}
         />
-        <input
-          type="date"
+        <DateTimeInput
           value={filter.until}
-          onChange={(event) => setFilter((prev) => ({ ...prev, until: event.target.value }))}
+          onChange={(value) => setFilter((prev) => ({ ...prev, until: value }))}
         />
       </FilterBar>
 
@@ -214,7 +215,10 @@ export default function InventoryPage() {
           </label>
           <label>
             <span>Used At</span>
-            <input type="date" name="usedAt" defaultValue={selectedItem?.usedAt ?? ''} />
+            <DateTimeInput
+              value={usedAt}
+              onChange={(value) => setUsedAt(value)}
+            />
           </label>
 
           <footer className={styles.footer}>

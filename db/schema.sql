@@ -163,8 +163,8 @@ create table public.internal_operations (
   machine_number text,
   machine_code text,
   working_site_name text,
-  start_date date,
-  end_date date
+  start_date timestamp with time zone,
+  end_date timestamp with time zone
 );
 
 create table public.outsource_operations (
@@ -173,8 +173,8 @@ create table public.outsource_operations (
   outsourcer_name text,
   machine_code text,
   working_site_name text,
-  start_date date,
-  end_date date
+  start_date timestamp with time zone,
+  end_date timestamp with time zone
 );
 
 create table public.service_operations (
@@ -191,7 +191,7 @@ create table public.transportation_operations (
   plate_num text,
   starting_loc text,
   ending_loc text,
-  date date,
+  date timestamp with time zone,
   notes text
 );
 
@@ -258,8 +258,8 @@ create table public.bill_lines_rental (
   total_price numeric,
   bill_id bigint references public.bills (id),
   operation_id bigint,
-  start_date date,
-  end_date date
+  start_date timestamp with time zone,
+  end_date timestamp with time zone
 );
 
 create table public.invoices (
@@ -295,8 +295,8 @@ create table public.invoice_lines_rental (
   total_price numeric,
   bill_id bigint references public.invoices (id),
   operation_id bigint,
-  start_date date,
-  end_date date
+  start_date timestamp with time zone,
+  end_date timestamp with time zone
 );
 
 create table public.outsource_invoice_lines (
@@ -304,16 +304,11 @@ create table public.outsource_invoice_lines (
   bill_id bigint references public.invoices (id) on delete cascade,
   outsource_operation_id bigint references public.outsource_operations (id),
   outsourcer_name text,
-  customer_name text,
-  machine_code text,
-  working_site_name text,
   type text,
   details text,
   unit_price numeric,
   amount numeric,
   total_price numeric,
-  start_date date,
-  end_date date,
   created_at timestamp with time zone default now()
 );
 
@@ -399,8 +394,8 @@ create table public.accounts (
 create table public.personel (
   personel_id bigint primary key generated always as identity,
   personel_name text not null,
-  start_date date,
-  end_date date,
+  start_date timestamp with time zone,
+  end_date timestamp with time zone,
   tc_kimlik text,
   birth_date date,
   role text,

@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
+import { DateTimeInput } from '../components/common/DateTimeInput';
 import { apiGet, apiPost } from '../lib/api';
+import { convertDDMMYYYYHHMMToISO, convertISOToDDMMYYYYHHMM } from '../lib/dateTimeUtils';
 import type { Bill, Invoice, PersonelPayment, TaxPayment, Account } from '../types';
 import { Modal } from '../components/common/Modal';
 import { ChevronDown, Settings } from 'lucide-react';
@@ -36,7 +38,7 @@ export default function TaxCalculationPage() {
   const [selectedTaxType, setSelectedTaxType] = useState<string>('');
   const [paymentForm, setPaymentForm] = useState({
     amount: '',
-    paymentDate: new Date().toISOString().split('T')[0],
+    paymentDate: convertISOToDDMMYYYYHHMM(new Date().toISOString()),
     accountId: '',
     notes: '',
   });
@@ -206,7 +208,7 @@ export default function TaxCalculationPage() {
       const payload = {
         taxType: selectedTaxType,
         amount: paymentForm.amount,
-        paymentDate: paymentForm.paymentDate,
+        paymentDate: convertDDMMYYYYHHMMToISO(paymentForm.paymentDate),
         accountId: paymentForm.accountId,
         accountName: accounts.find((a) => a.id === paymentForm.accountId)?.accountName || null,
         notes: paymentForm.notes || null,
@@ -423,10 +425,9 @@ export default function TaxCalculationPage() {
           </label>
           <label>
             <span>Ödeme Tarihi</span>
-            <input
-              type="date"
+            <DateTimeInput
               value={paymentForm.paymentDate}
-              onChange={(e) => setPaymentForm((prev) => ({ ...prev, paymentDate: e.target.value }))}
+              onChange={(value) => setPaymentForm((prev) => ({ ...prev, paymentDate: value }))}
               required
             />
           </label>

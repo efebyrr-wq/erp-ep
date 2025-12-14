@@ -4,7 +4,9 @@ import { DataTable } from '../components/common/DataTable';
 import { Modal } from '../components/common/Modal';
 import { Drawer } from '../components/common/Drawer';
 import { Tabs } from '../components/common/Tabs';
+import { DateTimeInput } from '../components/common/DateTimeInput';
 import { apiGet, apiPost, apiPatch, apiDelete } from '../lib/api';
+import { convertDDMMYYYYHHMMToISO, convertISOToDDMMYYYYHHMM } from '../lib/dateTimeUtils';
 import type { Personel, PersonelPayment, Account, PersonelDetail } from '../types';
 import styles from './PersonelPage.module.css';
 import { Trash2 } from 'lucide-react';
@@ -26,6 +28,21 @@ export default function PersonelPage() {
   const [newDetail, setNewDetail] = useState({ detailName: '', detailValue: '' });
   const [isAddingDetail, setIsAddingDetail] = useState(false);
   const [deletingDetailId, setDeletingDetailId] = useState<string | null>(null);
+  const [personelForm, setPersonelForm] = useState({
+    personelName: '',
+    role: '',
+    tcKimlik: '',
+    birthDate: '',
+    startDate: '',
+    endDate: '',
+  });
+  const [paymentForm, setPaymentForm] = useState({
+    personelName: '',
+    paymentAccount: '',
+    amount: '',
+    date: '',
+    notes: '',
+  });
 
   const loadPersonel = async () => {
     const data = await apiGet<Personel[]>('/personel', []);
@@ -50,11 +67,47 @@ export default function PersonelPage() {
 
   const openPersonelModal = (p?: Personel) => {
     setSelectedPersonel(p ?? null);
+    if (p) {
+      setPersonelForm({
+        personelName: p.personelName ?? '',
+        role: p.role ?? '',
+        tcKimlik: p.tcKimlik ?? '',
+        birthDate: p.birthDate ? convertISOToDDMMYYYYHHMM(p.birthDate) : '',
+        startDate: p.startDate ? convertISOToDDMMYYYYHHMM(p.startDate) : '',
+        endDate: p.endDate ? convertISOToDDMMYYYYHHMM(p.endDate) : '',
+      });
+    } else {
+      setPersonelForm({
+        personelName: '',
+        role: '',
+        tcKimlik: '',
+        birthDate: '',
+        startDate: '',
+        endDate: '',
+      });
+    }
     setPersonelModalOpen(true);
   };
 
   const openPaymentModal = (payment?: PersonelPayment) => {
     setSelectedPayment(payment ?? null);
+    if (payment) {
+      setPaymentForm({
+        personelName: payment.personelName ?? '',
+        paymentAccount: payment.paymentAccount ?? '',
+        amount: payment.amount ?? '',
+        date: payment.date ? convertISOToDDMMYYYYHHMM(payment.date) : '',
+        notes: payment.notes ?? '',
+      });
+    } else {
+      setPaymentForm({
+        personelName: '',
+        paymentAccount: '',
+        amount: '',
+        date: '',
+        notes: '',
+      });
+    }
     setPaymentModalOpen(true);
   };
 
@@ -73,14 +126,13 @@ export default function PersonelPage() {
 
     setLoading(true);
     try {
-      const formData = new FormData(event.currentTarget);
       const payload = {
-        personelName: (formData.get('personelName') as string) ?? '',
-        startDate: (formData.get('startDate') as string) || undefined,
-        endDate: (formData.get('endDate') as string) || undefined,
-        tcKimlik: (formData.get('tcKimlik') as string) || undefined,
-        birthDate: (formData.get('birthDate') as string) || undefined,
-        role: (formData.get('role') as string) || undefined,
+        personelName: personelForm.personelName || undefined,
+        startDate: personelForm.startDate ? convertDDMMYYYYHHMMToISO(personelForm.startDate) : undefined,
+        endDate: personelForm.endDate ? convertDDMMYYYYHHMMToISO(personelForm.endDate) : undefined,
+        tcKimlik: personelForm.tcKimlik || undefined,
+        birthDate: personelForm.birthDate ? convertDDMMYYYYHHMMToISO(personelForm.birthDate) : undefined,
+        role: personelForm.role || undefined,
       };
 
       if (selectedPersonel) {
@@ -126,13 +178,12 @@ export default function PersonelPage() {
 
     setLoading(true);
     try {
-      const formData = new FormData(event.currentTarget);
       const payload = {
-        personelName: (formData.get('personelName') as string) ?? '',
-        paymentAccount: (formData.get('paymentAccount') as string) || undefined,
-        amount: (formData.get('amount') as string) ? Number(formData.get('amount')) : undefined,
-        date: (formData.get('date') as string) || undefined,
-        notes: (formData.get('notes') as string) || undefined,
+        personelName: paymentForm.personelName || undefined,
+        paymentAccount: paymentForm.paymentAccount || undefined,
+        amount: paymentForm.amount ? Number(paymentForm.amount) : undefined,
+        date: paymentForm.date ? convertDDMMYYYYHHMMToISO(paymentForm.date) : undefined,
+        notes: paymentForm.notes || undefined,
       };
 
       if (selectedPayment) {
@@ -435,41 +486,44 @@ export default function PersonelPage() {
           <label>
             <span>Personel Adı</span>
             <input
-              name="personelName"
-              defaultValue={selectedPersonel?.personelName ?? ''}
+              value={personelForm.personelName}
+              onChange={(e) => setPersonelForm(prev => ({ ...prev, personelName: e.target.value }))}
               required
             />
           </label>
           <label>
             <span>Rol</span>
-            <input name="role" defaultValue={selectedPersonel?.role ?? ''} />
+            <input
+              value={personelForm.role}
+              onChange={(e) => setPersonelForm(prev => ({ ...prev, role: e.target.value }))}
+            />
           </label>
           <label>
             <span>TC Kimlik</span>
-            <input name="tcKimlik" defaultValue={selectedPersonel?.tcKimlik ?? ''} />
+            <input
+              value={personelForm.tcKimlik}
+              onChange={(e) => setPersonelForm(prev => ({ ...prev, tcKimlik: e.target.value }))}
+            />
           </label>
           <label>
             <span>Birth Date</span>
-            <input
-              name="birthDate"
-              type="date"
-              defaultValue={selectedPersonel?.birthDate ?? ''}
+            <DateTimeInput
+              value={personelForm.birthDate}
+              onChange={(value) => setPersonelForm(prev => ({ ...prev, birthDate: value }))}
             />
           </label>
           <label>
             <span>Başlangıç Tarihi</span>
-            <input
-              name="startDate"
-              type="date"
-              defaultValue={selectedPersonel?.startDate ?? ''}
+            <DateTimeInput
+              value={personelForm.startDate}
+              onChange={(value) => setPersonelForm(prev => ({ ...prev, startDate: value }))}
             />
           </label>
           <label>
             <span>Bitiş Tarihi (Hala çalışıyorsa boş bırakın)</span>
-            <input
-              name="endDate"
-              type="date"
-              defaultValue={selectedPersonel?.endDate ?? ''}
+            <DateTimeInput
+              value={personelForm.endDate}
+              onChange={(value) => setPersonelForm(prev => ({ ...prev, endDate: value }))}
               placeholder="Only fill when personel leaves"
             />
           </label>
@@ -494,8 +548,8 @@ export default function PersonelPage() {
           <label>
             <span>Personel Adı</span>
             <select
-              name="personelName"
-              defaultValue={selectedPayment?.personelName ?? ''}
+              value={paymentForm.personelName}
+              onChange={(e) => setPaymentForm(prev => ({ ...prev, personelName: e.target.value }))}
               required
             >
               <option value="" disabled>
@@ -511,8 +565,8 @@ export default function PersonelPage() {
           <label>
             <span>Ödeme Hesabı</span>
             <select
-              name="paymentAccount"
-              defaultValue={selectedPayment?.paymentAccount ?? ''}
+              value={paymentForm.paymentAccount}
+              onChange={(e) => setPaymentForm(prev => ({ ...prev, paymentAccount: e.target.value }))}
             >
               <option value="">Select account</option>
               {accounts.map((account) => (
@@ -525,26 +579,25 @@ export default function PersonelPage() {
           <label>
             <span>Amount</span>
             <input
-              name="amount"
               type="number"
               step="0.01"
-              defaultValue={selectedPayment?.amount ?? ''}
+              value={paymentForm.amount}
+              onChange={(e) => setPaymentForm(prev => ({ ...prev, amount: e.target.value }))}
             />
           </label>
           <label>
             <span>Date</span>
-            <input
-              name="date"
-              type="date"
-              defaultValue={selectedPayment?.date ?? ''}
+            <DateTimeInput
+              value={paymentForm.date}
+              onChange={(value) => setPaymentForm(prev => ({ ...prev, date: value }))}
             />
           </label>
           <label>
             <span>Notes</span>
             <textarea
-              name="notes"
               rows={3}
-              defaultValue={selectedPayment?.notes ?? ''}
+              value={paymentForm.notes}
+              onChange={(e) => setPaymentForm(prev => ({ ...prev, notes: e.target.value }))}
             />
           </label>
           <footer className={styles.footer}>

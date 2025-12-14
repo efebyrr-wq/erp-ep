@@ -23,7 +23,13 @@ export class CollectionsController {
 
   @Post('check')
   async createCheck(@Body() dto: CreateCollectionCheckDto): Promise<CollectionsCheck> {
-    return this.collectionsService.createCheck(dto);
+    console.log('[CollectionsController] ===== CREATE CHECK COLLECTION REQUEST =====');
+    console.log('[CollectionsController] Received DTO:', JSON.stringify(dto, null, 2));
+    console.log('[CollectionsController] accountName:', dto.accountName);
+    console.log('[CollectionsController] amount:', dto.amount);
+    const result = await this.collectionsService.createCheck(dto);
+    console.log('[CollectionsController] Collection created, ID:', result.id);
+    return result;
   }
 
   @Patch('check/:id')

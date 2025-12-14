@@ -555,7 +555,6 @@ function MapMarkers({
     
     if (machineryToShow.length === 0) return [];
     
-    console.log('[MachineryMap] Creating machinery markers for:', machineryToShow.length, 'machinery (idle + active without operations)');
     
     const markers: React.ReactElement[] = [];
     const locationGroups = new Map<string, Array<typeof activeMachinery[0]>>();
@@ -585,18 +584,15 @@ function MapMarkers({
               if (!isNaN(lat) && !isNaN(lon)) {
                 baseCoords = [lat, lon];
                 coordsKey = `${lat},${lon}`;
-                console.log(`[MachineryMap] Active machine ${machine.machineNumber} at working site: ${site.workingSiteName} (${lat}, ${lon})`);
               } else {
                 // Try parsing location string
                 const parsed = parseLocation(site.location || '');
                 if (parsed) {
                   baseCoords = parsed;
                   coordsKey = `${parsed[0]},${parsed[1]}`;
-                  console.log(`[MachineryMap] Active machine ${machine.machineNumber} at working site: ${site.workingSiteName} (parsed from location)`);
                 } else {
                   baseCoords = IDLE_MACHINERY_COORDS;
                   coordsKey = `${IDLE_MACHINERY_COORDS[0]},${IDLE_MACHINERY_COORDS[1]}`;
-                  console.log(`[MachineryMap] Active machine ${machine.machineNumber} - no valid site coordinates, using garage`);
                 }
               }
             } else {
@@ -605,11 +601,9 @@ function MapMarkers({
               if (parsed) {
                 baseCoords = parsed;
                 coordsKey = `${parsed[0]},${parsed[1]}`;
-                console.log(`[MachineryMap] Active machine ${machine.machineNumber} at working site: ${site.workingSiteName} (parsed from location)`);
               } else {
                 baseCoords = IDLE_MACHINERY_COORDS;
                 coordsKey = `${IDLE_MACHINERY_COORDS[0]},${IDLE_MACHINERY_COORDS[1]}`;
-                console.log(`[MachineryMap] Active machine ${machine.machineNumber} - no valid site coordinates, using garage`);
               }
             }
           } else {
@@ -620,16 +614,13 @@ function MapMarkers({
               if (!isNaN(lat) && !isNaN(lon) && lat !== 0 && lon !== 0) {
                 baseCoords = [lat, lon];
                 coordsKey = `${lat},${lon}`;
-                console.log(`[MachineryMap] Active machine ${machine.machineNumber} at coordinates: ${lat}, ${lon}`);
               } else {
                 baseCoords = IDLE_MACHINERY_COORDS;
                 coordsKey = `${IDLE_MACHINERY_COORDS[0]},${IDLE_MACHINERY_COORDS[1]}`;
-                console.log(`[MachineryMap] Active machine ${machine.machineNumber} has invalid coordinates, using garage`);
               }
             } else {
               baseCoords = IDLE_MACHINERY_COORDS;
               coordsKey = `${IDLE_MACHINERY_COORDS[0]},${IDLE_MACHINERY_COORDS[1]}`;
-              console.log(`[MachineryMap] Active machine ${machine.machineNumber} has no coordinates, using garage`);
             }
           }
         } else {
@@ -640,16 +631,13 @@ function MapMarkers({
             if (!isNaN(lat) && !isNaN(lon) && lat !== 0 && lon !== 0) {
               baseCoords = [lat, lon];
               coordsKey = `${lat},${lon}`;
-              console.log(`[MachineryMap] Active machine ${machine.machineNumber} (no operation) at coordinates: ${lat}, ${lon}`);
             } else {
               baseCoords = IDLE_MACHINERY_COORDS;
               coordsKey = `${IDLE_MACHINERY_COORDS[0]},${IDLE_MACHINERY_COORDS[1]}`;
-              console.log(`[MachineryMap] Active machine ${machine.machineNumber} (no operation) has invalid coordinates, using garage`);
             }
           } else {
             baseCoords = IDLE_MACHINERY_COORDS;
             coordsKey = `${IDLE_MACHINERY_COORDS[0]},${IDLE_MACHINERY_COORDS[1]}`;
-            console.log(`[MachineryMap] Active machine ${machine.machineNumber} (no operation) has no coordinates, using garage`);
           }
         }
       } else {
@@ -660,18 +648,15 @@ function MapMarkers({
           if (!isNaN(lat) && !isNaN(lon) && lat !== 0 && lon !== 0) {
             baseCoords = [lat, lon];
             coordsKey = `${lat},${lon}`;
-            console.log(`[MachineryMap] Machine ${machine.machineNumber} (${status}) at coordinates: ${lat}, ${lon}`);
           } else {
             // Invalid coordinates - use garage for idle machinery
             baseCoords = IDLE_MACHINERY_COORDS;
             coordsKey = `${IDLE_MACHINERY_COORDS[0]},${IDLE_MACHINERY_COORDS[1]}`;
-            console.log(`[MachineryMap] Machine ${machine.machineNumber} (${status}) has invalid coordinates, using garage`);
           }
         } else {
           // No coordinates - use garage location for idle machinery
           baseCoords = IDLE_MACHINERY_COORDS;
           coordsKey = `${IDLE_MACHINERY_COORDS[0]},${IDLE_MACHINERY_COORDS[1]}`;
-          console.log(`[MachineryMap] Machine ${machine.machineNumber} (${status}) has no coordinates, using garage`);
         }
       }
       

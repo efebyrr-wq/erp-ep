@@ -4,7 +4,9 @@ import clsx from 'clsx';
 import { DataTable } from '../components/common/DataTable';
 import { Tabs } from '../components/common/Tabs';
 import { Modal } from '../components/common/Modal';
+import { DateTimeInput } from '../components/common/DateTimeInput';
 import { apiGet, apiPost, apiPatch, apiDelete } from '../lib/api';
+import { convertDDMMYYYYHHMMToISO, convertISOToDDMMYYYYHHMM } from '../lib/dateTimeUtils';
 import {
   mockCollectionCash,
   mockCollectionCreditCard,
@@ -60,18 +62,24 @@ export default function CollectionsPage() {
   // Modal states for collections
   const [collectionCheckModalOpen, setCollectionCheckModalOpen] = useState(false);
   const [selectedCollectionCheck, setSelectedCollectionCheck] = useState<CollectionsCheck | null>(null);
+  const [collectionCheckForm, setCollectionCheckForm] = useState({ checkDate: '', collectionDate: '' });
   const [collectionCreditCardModalOpen, setCollectionCreditCardModalOpen] = useState(false);
   const [selectedCollectionCreditCard, setSelectedCollectionCreditCard] = useState<CollectionCreditCard | null>(null);
+  const [collectionCreditCardForm, setCollectionCreditCardForm] = useState({ transactionDate: '' });
   const [collectionCashModalOpen, setCollectionCashModalOpen] = useState(false);
   const [selectedCollectionCash, setSelectedCollectionCash] = useState<CollectionCash | null>(null);
+  const [collectionCashForm, setCollectionCashForm] = useState({ transactionDate: '' });
 
   // Modal states for payments
   const [paymentCheckModalOpen, setPaymentCheckModalOpen] = useState(false);
   const [selectedPaymentCheck, setSelectedPaymentCheck] = useState<PaymentCheck | null>(null);
+  const [paymentCheckForm, setPaymentCheckForm] = useState({ checkDate: '', collectionDate: '' });
   const [paymentCreditCardModalOpen, setPaymentCreditCardModalOpen] = useState(false);
   const [selectedPaymentCreditCard, setSelectedPaymentCreditCard] = useState<PaymentCreditCard | null>(null);
+  const [paymentCreditCardForm, setPaymentCreditCardForm] = useState({ transactionDate: '' });
   const [paymentCashModalOpen, setPaymentCashModalOpen] = useState(false);
   const [selectedPaymentCash, setSelectedPaymentCash] = useState<PaymentsCash | null>(null);
+  const [paymentCashForm, setPaymentCashForm] = useState({ transactionDate: '' });
 
   const loadAccounts = async () => {
     const data = await apiGet<Account[]>('/accounts', []);
@@ -162,11 +170,15 @@ export default function CollectionsPage() {
     setLoading(true);
     try {
       const formData = new FormData(e.currentTarget);
+      // Convert DD/MM/YYYY to YYYY-MM-DD for backend
+      const checkDate = collectionCheckForm.checkDate || (selectedCollectionCheck?.checkDate || '');
+      const collectionDate = collectionCheckForm.collectionDate || (selectedCollectionCheck?.collectionDate || '');
+      
       const payload = {
         customerName: formData.get('customerName') as string,
-        checkDate: formData.get('checkDate') as string,
+        checkDate: checkDate ? convertDDMMYYYYHHMMToISO(checkDate) : (selectedCollectionCheck?.checkDate || ''),
         amount: formData.get('amount') as string,
-        collectionDate: formData.get('collectionDate') as string,
+        collectionDate: collectionDate ? convertDDMMYYYYHHMMToISO(collectionDate) : (selectedCollectionCheck?.collectionDate || ''),
         accountName: formData.get('accountName') as string,
         notes: formData.get('notes') as string || undefined,
       };
@@ -178,25 +190,63 @@ export default function CollectionsPage() {
         );
         if (updated) {
           await loadData();
-          // Refresh customers to get updated balance
+          // Refresh customers and accounts to get updated balances
           void apiGet<Customer[]>('/customers', []).then((data) => {
             setCustomers(data);
           });
+          void loadAccounts(); // Refresh accounts to see updated balance
           setCollectionCheckModalOpen(false);
         } else {
           alert('Failed to update collection. Please try again.');
         }
       } else {
-        const created = await apiPost<typeof payload, CollectionsCheck>('/collections/check', payload);
-        if (created) {
+        console.log('[CollectionsPage] Creating check collection with payload:', payload);
+        console.log('[CollectionsPage] Account name:', payload.accountName);
+        console.log('[CollectionsPage] Amount:', payload.amount);
+        let created: CollectionsCheck | null = null;
+        try {
+          created = await apiPost<typeof payload, CollectionsCheck>('/collections/check', payload);
+          console.log('[CollectionsPage] Collection created response:', created);
+          console.log('[CollectionsPage] Created ID:', created?.id);
+          console.log('[CollectionsPage] Created amount:', created?.amount);
+          console.log('[CollectionsPage] Created accountName:', created?.accountName);
+        } catch (error) {
+          console.error('[CollectionsPage] ❌ Error creating collection:', error);
+          alert('Failed to create collection. Please check the console for details.');
+          return;
+        }
+        
+        if (created && created.id) {
+          console.log(`[CollectionsPage] ✅ Collection ${created.id} created successfully`);
+          
+          // Verify the collection was actually saved by fetching it
+          await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second for backend to process
+          console.log(`[CollectionsPage] 🔍 Verifying collection ${created.id} exists in database...`);
+          const verifyCollection = await apiGet<CollectionsCheck[]>(`/collections/check`, []);
+          console.log(`[CollectionsPage] 🔍 Verification response: Found ${verifyCollection.length} collections`);
+          console.log(`[CollectionsPage] 🔍 Looking for collection ID: ${created.id}`);
+          console.log(`[CollectionsPage] 🔍 Available IDs:`, verifyCollection.map(c => c.id));
+          const found = verifyCollection.find(c => c.id === created!.id);
+          if (!found) {
+            console.warn(`[CollectionsPage] ⚠️ Collection ${created.id} not found in database after creation. It may not have been saved.`);
+            console.warn(`[CollectionsPage] ⚠️ This suggests the collection was not actually saved to the database.`);
+            alert('Collection was created but may not have been saved. Please refresh and check.');
+          } else {
+            console.log(`[CollectionsPage] ✅ Verified collection ${created.id} exists in database`);
+            console.log(`[CollectionsPage] ✅ Collection details:`, found);
+          }
+          
           await loadData();
-          // Refresh customers to get updated balance
+          // Refresh customers and accounts to get updated balances
           void apiGet<Customer[]>('/customers', []).then((data) => {
             setCustomers(data);
           });
+          await loadAccounts(); // Refresh accounts to see updated balance - await to ensure it completes
+          console.log('[CollectionsPage] Accounts refreshed after collection creation');
           setCollectionCheckModalOpen(false);
         } else {
-          alert('Failed to create collection. Please try again.');
+          console.error('[CollectionsPage] ❌ Collection creation failed or returned invalid response:', created);
+          alert('Failed to create collection. Please check the console for details.');
         }
       }
     } catch (error) {
@@ -239,7 +289,11 @@ export default function CollectionsPage() {
               <section>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
                   <h3>Tahsilatlar</h3>
-                  <button type="button" onClick={() => { setSelectedCollectionCheck(null); setCollectionCheckModalOpen(true); }} className={styles.addButton}>
+                  <button type="button" onClick={() => { 
+                    setSelectedCollectionCheck(null); 
+                    setCollectionCheckForm({ checkDate: '', collectionDate: '' });
+                    setCollectionCheckModalOpen(true); 
+                  }} className={styles.addButton}>
                     + Add
                   </button>
                 </div>
@@ -261,7 +315,14 @@ export default function CollectionsPage() {
                       header: 'İşlemler',
                       render: (record: CollectionsCheck) => (
                         <div className={styles.actions}>
-                          <button type="button" onClick={() => { setSelectedCollectionCheck(record); setCollectionCheckModalOpen(true); }}>
+                          <button type="button" onClick={() => { 
+                            setSelectedCollectionCheck(record); 
+                            setCollectionCheckForm({
+                              checkDate: record.checkDate ? convertISOToDDMMYYYYHHMM(record.checkDate) : '',
+                              collectionDate: record.collectionDate ? convertISOToDDMMYYYYHHMM(record.collectionDate) : '',
+                            });
+                            setCollectionCheckModalOpen(true); 
+                          }}>
                             Düzenle
                           </button>
                           <button type="button" onClick={() => handleCollectionCheckDelete(record)} disabled={loading}>
@@ -623,16 +684,24 @@ export default function CollectionsPage() {
             </select>
           </label>
           <label>
-            <span>Check Date</span>
-            <input type="date" name="checkDate" defaultValue={selectedCollectionCheck?.checkDate ?? ''} required />
+            <span>Check Date (DD/MM/YYYY)</span>
+            <DateTimeInput
+              value={collectionCheckForm.checkDate || (selectedCollectionCheck?.checkDate ? convertISOToDDMMYYYYHHMM(selectedCollectionCheck.checkDate) : '')}
+              onChange={(value) => setCollectionCheckForm(prev => ({ ...prev, checkDate: value }))}
+              required
+            />
           </label>
           <label>
             <span>Amount</span>
             <input type="number" step="0.01" name="amount" defaultValue={selectedCollectionCheck?.amount ?? ''} required />
           </label>
           <label>
-            <span>Collection Date</span>
-            <input type="date" name="collectionDate" defaultValue={selectedCollectionCheck?.collectionDate ?? ''} required />
+            <span>Collection Date (DD/MM/YYYY)</span>
+            <DateTimeInput
+              value={collectionCheckForm.collectionDate || (selectedCollectionCheck?.collectionDate ? convertISOToDDMMYYYYHHMM(selectedCollectionCheck.collectionDate) : '')}
+              onChange={(value) => setCollectionCheckForm(prev => ({ ...prev, collectionDate: value }))}
+              required
+            />
           </label>
           <label>
             <span>Account</span>
@@ -673,11 +742,14 @@ export default function CollectionsPage() {
           setLoading(true);
           try {
             const formData = new FormData(e.currentTarget);
+            // Convert DD/MM/YYYY to YYYY-MM-DD for backend
+            const checkDate = paymentCheckForm.checkDate || (selectedPaymentCheck?.checkDate || '');
+            const collectionDate = paymentCheckForm.collectionDate || (selectedPaymentCheck?.collectionDate || '');
             const payload = {
               collectorName: formData.get('collectorName') as string,
-              checkDate: formData.get('checkDate') as string,
+              checkDate: checkDate ? convertDDMMYYYYHHMMToISO(checkDate) : (selectedPaymentCheck?.checkDate || ''),
               amount: formData.get('amount') as string,
-              collectionDate: formData.get('collectionDate') as string,
+              collectionDate: collectionDate ? convertDDMMYYYYHHMMToISO(collectionDate) : (selectedPaymentCheck?.collectionDate || ''),
               accountName: formData.get('accountName') as string,
               notes: formData.get('notes') as string || undefined,
               customerName: formData.get('customerName') as string || undefined,
@@ -724,7 +796,11 @@ export default function CollectionsPage() {
           </label>
           <label>
             <span>Check Date</span>
-            <input type="date" name="checkDate" defaultValue={selectedPaymentCheck?.checkDate ?? ''} required />
+            <DateTimeInput
+              value={paymentCheckForm.checkDate || (selectedPaymentCheck?.checkDate ? convertISOToDDMMYYYYHHMM(selectedPaymentCheck.checkDate) : '')}
+              onChange={(value) => setPaymentCheckForm(prev => ({ ...prev, checkDate: value }))}
+              required
+            />
           </label>
           <label>
             <span>Amount</span>
@@ -732,7 +808,11 @@ export default function CollectionsPage() {
           </label>
           <label>
             <span>Collection Date</span>
-            <input type="date" name="collectionDate" defaultValue={selectedPaymentCheck?.collectionDate ?? ''} required />
+            <DateTimeInput
+              value={paymentCheckForm.collectionDate || (selectedPaymentCheck?.collectionDate ? convertISOToDDMMYYYYHHMM(selectedPaymentCheck.collectionDate) : '')}
+              onChange={(value) => setPaymentCheckForm(prev => ({ ...prev, collectionDate: value }))}
+              required
+            />
           </label>
           <label>
             <span>Account</span>
@@ -773,9 +853,11 @@ export default function CollectionsPage() {
           setLoading(true);
           try {
             const formData = new FormData(e.currentTarget);
+            // Convert DD/MM/YYYY to YYYY-MM-DD for backend
+            const transactionDate = collectionCreditCardForm.transactionDate || (selectedCollectionCreditCard?.transactionDate || '');
             const payload = {
               customerName: formData.get('customerName') as string,
-              transactionDate: formData.get('transactionDate') as string,
+              transactionDate: transactionDate ? convertDDMMYYYYHHMMToISO(transactionDate) : (selectedCollectionCreditCard?.transactionDate || ''),
               amount: formData.get('amount') as string,
               paymentTo: formData.get('paymentTo') as string,
               creditCardFee: formData.get('creditCardFee') as string || undefined,
@@ -826,8 +908,12 @@ export default function CollectionsPage() {
             </select>
           </label>
           <label>
-            <span>Transaction Date</span>
-            <input type="date" name="transactionDate" defaultValue={selectedCollectionCreditCard?.transactionDate ?? ''} required />
+            <span>Transaction Date (DD/MM/YYYY)</span>
+            <DateTimeInput
+              value={collectionCreditCardForm.transactionDate || (selectedCollectionCreditCard?.transactionDate ? convertISOToDDMMYYYYHHMM(selectedCollectionCreditCard.transactionDate) : '')}
+              onChange={(value) => setCollectionCreditCardForm({ transactionDate: value })}
+              required
+            />
           </label>
           <label>
             <span>Amount</span>
@@ -923,7 +1009,7 @@ export default function CollectionsPage() {
             const formData = new FormData(e.currentTarget);
             const payload = {
               collectorName: formData.get('collectorName') as string,
-              transactionDate: formData.get('transactionDate') as string,
+              transactionDate: paymentCreditCardForm.transactionDate ? convertDDMMYYYYHHMMToISO(paymentCreditCardForm.transactionDate) : (selectedPaymentCreditCard?.transactionDate || ''),
               amount: formData.get('amount') as string,
               paymentFrom: formData.get('paymentFrom') as string,
               creditCardFee: formData.get('creditCardFee') as string || undefined,
@@ -983,8 +1069,12 @@ export default function CollectionsPage() {
             </select>
           </label>
           <label>
-            <span>Transaction Date</span>
-            <input type="date" name="transactionDate" defaultValue={selectedPaymentCreditCard?.transactionDate ?? ''} required />
+            <span>Transaction Date (DD/MM/YYYY)</span>
+            <DateTimeInput
+              value={paymentCreditCardForm.transactionDate || (selectedPaymentCreditCard?.transactionDate ? convertISOToDDMMYYYYHHMM(selectedPaymentCreditCard.transactionDate) : '')}
+              onChange={(value) => setPaymentCreditCardForm({ transactionDate: value })}
+              required
+            />
           </label>
           <label>
             <span>Amount</span>
@@ -1039,7 +1129,7 @@ export default function CollectionsPage() {
             const formData = new FormData(e.currentTarget);
             const payload = {
               customerName: formData.get('customerName') as string,
-              transactionDate: formData.get('transactionDate') as string,
+              transactionDate: collectionCashForm.transactionDate ? convertDDMMYYYYHHMMToISO(collectionCashForm.transactionDate) : (selectedCollectionCash?.transactionDate || ''),
               amount: formData.get('amount') as string,
               accountName: formData.get('accountName') as string,
               notes: formData.get('notes') as string || undefined,
@@ -1085,8 +1175,12 @@ export default function CollectionsPage() {
             </select>
           </label>
           <label>
-            <span>Transaction Date</span>
-            <input type="date" name="transactionDate" defaultValue={selectedCollectionCash?.transactionDate ?? ''} required />
+            <span>Transaction Date (DD/MM/YYYY)</span>
+            <DateTimeInput
+              value={collectionCashForm.transactionDate || (selectedCollectionCash?.transactionDate ? convertISOToDDMMYYYYHHMM(selectedCollectionCash.transactionDate) : '')}
+              onChange={(value) => setCollectionCashForm({ transactionDate: value })}
+              required
+            />
           </label>
           <label>
             <span>Amount</span>
@@ -1133,7 +1227,7 @@ export default function CollectionsPage() {
             const formData = new FormData(e.currentTarget);
             const payload = {
               collectorName: formData.get('collectorName') as string,
-              transactionDate: formData.get('transactionDate') as string,
+              transactionDate: paymentCashForm.transactionDate ? convertDDMMYYYYHHMMToISO(paymentCashForm.transactionDate) : (selectedPaymentCash?.transactionDate || ''),
               amount: formData.get('amount') as string,
               accountName: formData.get('accountName') as string,
               notes: formData.get('notes') as string || undefined,
@@ -1191,8 +1285,12 @@ export default function CollectionsPage() {
             </select>
           </label>
           <label>
-            <span>Transaction Date</span>
-            <input type="date" name="transactionDate" defaultValue={selectedPaymentCash?.transactionDate ?? ''} required />
+            <span>Transaction Date (DD/MM/YYYY)</span>
+            <DateTimeInput
+              value={paymentCashForm.transactionDate || (selectedPaymentCash?.transactionDate ? convertISOToDDMMYYYYHHMM(selectedPaymentCash.transactionDate) : '')}
+              onChange={(value) => setPaymentCashForm({ transactionDate: value })}
+              required
+            />
           </label>
           <label>
             <span>Amount</span>

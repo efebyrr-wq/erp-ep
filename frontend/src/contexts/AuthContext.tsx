@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useRef, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useRef, useCallback, useMemo, ReactNode } from 'react';
 import { apiPost } from '../lib/api';
 
 interface AuthContextType {
@@ -159,7 +159,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [isAuthenticated]);
 
-  const login = async (username: string, password: string): Promise<boolean> => {
+  const login = useCallback(async (username: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     try {
       const response = await apiPost<{ username: string; password: string }, { success: boolean; message: string }>(
@@ -178,10 +178,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  const value = useMemo(() => ({
+    isAuthenticated,
+    login,
+    logout,
+    isLoading,
+  }), [isAuthenticated, login, logout, isLoading]);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, isLoading }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

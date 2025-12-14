@@ -2,9 +2,10 @@ import { useEffect, useState, useMemo } from 'react';
 import { DataTable } from '../components/common/DataTable';
 import { Tabs } from '../components/common/Tabs';
 import { Modal } from '../components/common/Modal';
-import { DateInput } from '../components/common/DateInput';
+import { DateTimeInput } from '../components/common/DateTimeInput';
+import { convertDDMMYYYYHHMMToISO, convertISOToDDMMYYYYHHMM } from '../lib/dateTimeUtils';
 import { apiGet, apiPost, apiDelete, apiPatch } from '../lib/api';
-import { formatDateDDMMYYYY, convertYYYYMMDDToDDMMYYYY, convertDDMMYYYYToYYYYMMDD } from '../lib/dateUtils';
+import { formatDateDDMMYYYY } from '../lib/dateUtils';
 import {
   mockInternalOperations,
   mockOutsourceOperations,
@@ -373,11 +374,22 @@ export default function OperationsPage() {
 
   // Filter idle machinery
   const idleMachinery = useMemo(() => {
-    return machinery.filter((m) => {
+    // Get idle machinery
+    const idle = machinery.filter((m) => {
       const status = String(m.status || '').trim().toUpperCase();
       return status === 'IDLE' || status === '';
     });
-  }, [machinery]);
+    
+    // When editing, include the currently selected machine even if it's not idle
+    if (editingInternalId && internalForm.machineNumber) {
+      const currentMachine = machinery.find((m) => m.machineNumber === internalForm.machineNumber);
+      if (currentMachine && !idle.find((m) => m.machineNumber === currentMachine.machineNumber)) {
+        return [...idle, currentMachine];
+      }
+    }
+    
+    return idle;
+  }, [machinery, editingInternalId, internalForm.machineNumber]);
 
   // Show all operations including closed ones (no filtering by endDate)
   const filteredInternal = internalOps;
@@ -438,8 +450,8 @@ export default function OperationsPage() {
         machineNumber: internalOp.machineNumber || '',
         machineCode: internalOp.machineCode || '',
         workingSiteName: internalOp.workingSiteName || '',
-        startDate: internalOp.startDate ? convertYYYYMMDDToDDMMYYYY(internalOp.startDate.split('T')[0]) : '',
-        endDate: internalOp.endDate ? convertYYYYMMDDToDDMMYYYY(internalOp.endDate.split('T')[0]) : '',
+        startDate: internalOp.startDate ? convertISOToDDMMYYYYHHMM(internalOp.startDate) : '',
+        endDate: internalOp.endDate ? convertISOToDDMMYYYYHHMM(internalOp.endDate) : '',
       });
       setTab('internal');
     } else if ('customerName' in operation && 'outsourcerName' in operation) {
@@ -451,8 +463,8 @@ export default function OperationsPage() {
         outsourcerName: outsourceOp.outsourcerName || '',
         machineCode: outsourceOp.machineCode || '',
         workingSiteName: outsourceOp.workingSiteName || '',
-        startDate: outsourceOp.startDate ? convertYYYYMMDDToDDMMYYYY(outsourceOp.startDate.split('T')[0]) : '',
-        endDate: outsourceOp.endDate ? convertYYYYMMDDToDDMMYYYY(outsourceOp.endDate.split('T')[0]) : '',
+        startDate: outsourceOp.startDate ? convertISOToDDMMYYYYHHMM(outsourceOp.startDate) : '',
+        endDate: outsourceOp.endDate ? convertISOToDDMMYYYYHHMM(outsourceOp.endDate) : '',
       });
       setTab('outsource');
     } else if ('machineNumber' in operation && 'type' in operation) {
@@ -474,7 +486,7 @@ export default function OperationsPage() {
         plateNum: transportationOp.plateNum || '',
         startingLoc: transportationOp.startingLoc || '',
         endingLoc: transportationOp.endingLoc || '',
-        operationDate: transportationOp.operationDate ? convertYYYYMMDDToDDMMYYYY(transportationOp.operationDate.split('T')[0]) : '',
+        operationDate: transportationOp.operationDate ? convertISOToDDMMYYYYHHMM(transportationOp.operationDate) : '',
         notes: transportationOp.notes || '',
       });
       setTab('transportation');
@@ -492,11 +504,11 @@ export default function OperationsPage() {
         workingSiteName: internalForm.workingSiteName?.trim() || null,
         startDate: internalForm.startDate?.trim() ? (() => {
           const date = internalForm.startDate.trim();
-          return /^\d{2}\/\d{2}\/\d{4}$/.test(date) ? convertDDMMYYYYToYYYYMMDD(date) : date;
+          return /^\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}$/.test(date) ? convertDDMMYYYYHHMMToISO(date) : date;
         })() : null,
         endDate: internalForm.endDate?.trim() ? (() => {
           const date = internalForm.endDate.trim();
-          return /^\d{2}\/\d{2}\/\d{4}$/.test(date) ? convertDDMMYYYYToYYYYMMDD(date) : date;
+          return /^\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}$/.test(date) ? convertDDMMYYYYHHMMToISO(date) : date;
         })() : null,
       };
 
@@ -566,11 +578,11 @@ export default function OperationsPage() {
         workingSiteName: outsourceForm.workingSiteName?.trim() || null,
         startDate: outsourceForm.startDate?.trim() ? (() => {
           const date = outsourceForm.startDate.trim();
-          return /^\d{2}\/\d{2}\/\d{4}$/.test(date) ? convertDDMMYYYYToYYYYMMDD(date) : date;
+          return /^\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}$/.test(date) ? convertDDMMYYYYHHMMToISO(date) : date;
         })() : null,
         endDate: outsourceForm.endDate?.trim() ? (() => {
           const date = outsourceForm.endDate.trim();
-          return /^\d{2}\/\d{2}\/\d{4}$/.test(date) ? convertDDMMYYYYToYYYYMMDD(date) : date;
+          return /^\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}$/.test(date) ? convertDDMMYYYYHHMMToISO(date) : date;
         })() : null,
       };
 
@@ -697,7 +709,7 @@ export default function OperationsPage() {
         endingLoc: transportationForm.endingLoc.trim() || null,
         operationDate: transportationForm.operationDate.trim() ? (() => {
           const date = transportationForm.operationDate.trim();
-          return /^\d{2}\/\d{2}\/\d{4}$/.test(date) ? convertDDMMYYYYToYYYYMMDD(date) : date;
+          return /^\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}$/.test(date) ? convertDDMMYYYYHHMMToISO(date) : date;
         })() : null,
         notes: transportationForm.notes.trim() || null,
       };
@@ -1236,7 +1248,10 @@ export default function OperationsPage() {
               <select
                 value={internalForm.machineNumber || ''}
                 onChange={(e) => {
+                  // Check both idleMachinery and all machinery to find the selected machine
                   const selectedMachine = idleMachinery.find(
+                    (m) => m.machineNumber === e.target.value,
+                  ) || machinery.find(
                     (m) => m.machineNumber === e.target.value,
                   );
                   if (selectedMachine) {
@@ -1262,6 +1277,20 @@ export default function OperationsPage() {
                 ))}
               </select>
             </label>
+            {internalForm.machineCode && (
+              <label>
+                <span>Makine Kodu</span>
+                <input
+                  type="text"
+                  value={internalForm.machineCode}
+                  readOnly
+                  style={{
+                    backgroundColor: '#f1f5f9',
+                    cursor: 'not-allowed',
+                  }}
+                />
+              </label>
+            )}
             <label>
               <span>Şantiye Adı</span>
               <select
@@ -1280,14 +1309,14 @@ export default function OperationsPage() {
             </label>
             <label>
               <span>Başlangıç Tarihi (GG/AA/YYYY)</span>
-              <DateInput
+              <DateTimeInput
                 value={internalForm.startDate}
                 onChange={(value) => setInternalForm((prev) => ({ ...prev, startDate: value }))}
               />
             </label>
             <label>
-              <span>Bitiş Tarihi (GG/AA/YYYY)</span>
-              <DateInput
+              <span>Bitiş Tarihi (GG/AA/YYYY SS:DD)</span>
+              <DateTimeInput
                 value={internalForm.endDate}
                 onChange={(value) => setInternalForm((prev) => ({ ...prev, endDate: value }))}
               />
@@ -1365,15 +1394,15 @@ export default function OperationsPage() {
               </select>
             </label>
             <label>
-              <span>Başlangıç Tarihi (GG/AA/YYYY)</span>
-              <DateInput
+              <span>Başlangıç Tarihi (GG/AA/YYYY SS:DD)</span>
+              <DateTimeInput
                 value={outsourceForm.startDate}
                 onChange={(value) => setOutsourceForm((prev) => ({ ...prev, startDate: value }))}
               />
             </label>
             <label>
-              <span>Bitiş Tarihi (GG/AA/YYYY)</span>
-              <DateInput
+              <span>Bitiş Tarihi (GG/AA/YYYY SS:DD)</span>
+              <DateTimeInput
                 value={outsourceForm.endDate}
                 onChange={(value) => setOutsourceForm((prev) => ({ ...prev, endDate: value }))}
               />
@@ -1503,7 +1532,7 @@ export default function OperationsPage() {
             </label>
             <label>
               <span>Operasyon Tarihi (GG/AA/YYYY)</span>
-              <DateInput
+              <DateTimeInput
                 value={transportationForm.operationDate}
                 onChange={(value) => setTransportationForm((prev) => ({ ...prev, operationDate: value }))}
               />

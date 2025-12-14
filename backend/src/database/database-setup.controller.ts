@@ -355,5 +355,109 @@ export class DatabaseSetupController {
       throw error;
     }
   }
+
+  @Post('migrate-remove-outsource-invoice-columns')
+  async migrateRemoveOutsourceInvoiceColumns() {
+    try {
+      this.logger.log('Starting migration: Remove columns from outsource_invoice_lines table...');
+      
+      const columnsToRemove = [
+        'customer_name',
+        'machine_code',
+        'working_site_name',
+        'start_date',
+        'end_date',
+      ];
+
+      const results = {
+        columnsRemoved: [] as string[],
+        columnsSkipped: [] as string[],
+        errors: [] as string[],
+      };
+
+      for (const column of columnsToRemove) {
+        try {
+          // Check if column exists before dropping
+          const columnExists = await this.dataSource.query(`
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_schema = 'public' 
+              AND table_name = 'outsource_invoice_lines' 
+              AND column_name = $1
+          `, [column]);
+
+          if (columnExists.length > 0) {
+            await this.dataSource.query(`
+              ALTER TABLE public.outsource_invoice_lines 
+              DROP COLUMN IF EXISTS ${column}
+            `);
+            results.columnsRemoved.push(column);
+            this.logger.log(`   ✅ Removed column: ${column}`);
+          } else {
+            results.columnsSkipped.push(column);
+            this.logger.log(`   ⏭️  Column ${column} does not exist, skipping`);
+          }
+        } catch (error) {
+          const errorMsg = error instanceof Error ? error.message : String(error);
+          results.errors.push(`${column}: ${errorMsg}`);
+          this.logger.error(`   ❌ Error removing column ${column}:`, errorMsg);
+        }
+      }
+
+      return {
+        success: results.errors.length === 0,
+        message: 'Migration completed',
+        details: {
+          columnsRemoved: results.columnsRemoved,
+          columnsSkipped: results.columnsSkipped,
+          errors: results.errors,
+        },
+      };
+    } catch (error) {
+      this.logger.error('Error during migration:', error);
+      return {
+        success: false,
+        message: 'Migration failed',
+        error: error instanceof Error ? error.message : String(error),
+      };
+    }
+  }
+
+  @Post('migrate-date-to-timestamp')
+  async migrateDateToTimestamp() {
+    this.logger.log('Starting migration to change date columns to timestamp...');
+    try {
+      // Change internal_operations date columns to timestamp
+      await this.dataSource.query(`
+        ALTER TABLE public.internal_operations
+        ALTER COLUMN start_date TYPE timestamp with time zone USING start_date::timestamp with time zone,
+        ALTER COLUMN end_date TYPE timestamp with time zone USING end_date::timestamp with time zone;
+      `);
+      this.logger.log('✅ Successfully updated internal_operations date columns.');
+
+      // Change outsource_operations date columns to timestamp
+      await this.dataSource.query(`
+        ALTER TABLE public.outsource_operations
+        ALTER COLUMN start_date TYPE timestamp with time zone USING start_date::timestamp with time zone,
+        ALTER COLUMN end_date TYPE timestamp with time zone USING end_date::timestamp with time zone;
+      `);
+      this.logger.log('✅ Successfully updated outsource_operations date columns.');
+
+      // Change transportation_operations date column to timestamp
+      await this.dataSource.query(`
+        ALTER TABLE public.transportation_operations
+        ALTER COLUMN date TYPE timestamp with time zone USING date::timestamp with time zone;
+      `);
+      this.logger.log('✅ Successfully updated transportation_operations date column.');
+
+      return { 
+        success: true, 
+        message: 'Date columns migrated to timestamp successfully. Time will now be preserved.' 
+      };
+    } catch (error) {
+      this.logger.error('❌ Error during migration to change date to timestamp:', error);
+      throw error;
+    }
+  }
 }
 

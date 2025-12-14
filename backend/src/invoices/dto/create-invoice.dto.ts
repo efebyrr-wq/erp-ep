@@ -29,27 +29,6 @@ class InvoiceLineInputDto {
   @IsOptional()
   @IsString()
   operationId?: string;
-
-  // Outsource invoice line fields
-  @IsOptional()
-  @IsString()
-  customerName?: string;
-
-  @IsOptional()
-  @IsString()
-  machineCode?: string;
-
-  @IsOptional()
-  @IsString()
-  workingSiteName?: string;
-
-  @IsOptional()
-  @IsDateString()
-  startDate?: string;
-
-  @IsOptional()
-  @IsDateString()
-  endDate?: string;
 }
 
 export class CreateInvoiceDto {

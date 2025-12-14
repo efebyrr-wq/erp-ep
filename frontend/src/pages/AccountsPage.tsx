@@ -17,12 +17,80 @@ export default function AccountsPage() {
   const [selectedType, setSelectedType] = useState<string>('');
 
   const loadAccounts = async () => {
-    const data = await apiGet<Account[]>('/accounts', mockAccounts);
-    setAccounts(data);
+    console.log('[AccountsPage] 🔄 Loading accounts...');
+    try {
+      // Fetch with cache-busting to ensure fresh data
+      const timestamp = Date.now();
+      // Use the same API_BASE_URL logic as api.ts
+      const apiBaseUrl = (() => {
+        if (import.meta.env.VITE_API_BASE_URL) {
+          return import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '');
+        }
+        if (import.meta.env.MODE === 'production' && typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+          return 'https://d31tialuhzl449.cloudfront.net';
+        }
+        return 'http://localhost:3000';
+      })();
+      const response = await fetch(`${apiBaseUrl}/accounts?t=${timestamp}`, {
+        cache: 'no-store', // Prevent browser caching
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+      }
+      const data = (await response.json()) as Account[];
+      console.log(`[AccountsPage] ✅ Loaded ${data.length} accounts`);
+      console.log('[AccountsPage] 📊 Raw API response (first 3):', data.slice(0, 3));
+      const balances = data.map(a => `${a.accountName}: ${a.balance}`);
+      console.log('[AccountsPage] 💰 Account balances:', balances);
+      
+      // Verify IsBankası Checking Account specifically
+      const isBankasi = data.find(a => a.accountName?.includes('IsBankası Checking'));
+      if (isBankasi) {
+        console.log(`[AccountsPage] 🔍 IsBankası Checking Account raw data:`, isBankasi);
+        console.log(`[AccountsPage] 🔍 IsBankası Checking Account balance (raw):`, isBankasi.balance, typeof isBankasi.balance);
+      }
+      
+      setAccounts(data);
+      
+      // Log specific accounts
+      const garantiChecking = data.find(a => a.accountName?.includes('Garanti Checking'));
+      if (garantiChecking) {
+        console.log(`[AccountsPage] 🏦 Garanti Checking Account balance: ${garantiChecking.balance}`);
+      }
+      const isBankasiAccount = data.find(a => a.accountName?.includes('IsBankası Checking'));
+      if (isBankasiAccount) {
+        console.log(`[AccountsPage] 🏦 IsBankası Checking Account balance: ${isBankasiAccount.balance}`);
+      }
+    } catch (error) {
+      console.error('[AccountsPage] ❌ Error loading accounts:', error);
+    }
   };
 
   useEffect(() => {
     void loadAccounts();
+  }, []);
+
+  // Refresh accounts when page becomes visible (user navigates to this page)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // Page became visible, refresh accounts
+        void loadAccounts();
+      }
+    };
+
+    const handleFocus = () => {
+      // Window gained focus, refresh accounts
+      void loadAccounts();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   const openModal = (account?: Account) => {
@@ -123,9 +191,14 @@ export default function AccountsPage() {
           <h1>Hesaplar</h1>
           <p>Genel muhasebe hesaplarını yönetin ve mevcut bakiyeleri takip edin.</p>
         </div>
-        <button type="button" onClick={() => openModal()}>
-          + Hesap Ekle
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button type="button" onClick={() => void loadAccounts()}>
+            🔄 Yenile
+          </button>
+          <button type="button" onClick={() => openModal()}>
+            + Hesap Ekle
+          </button>
+        </div>
       </header>
 
       <DataTable
