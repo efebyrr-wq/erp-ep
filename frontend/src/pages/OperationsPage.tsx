@@ -115,8 +115,8 @@ export default function OperationsPage() {
     };
   }, [deliveryImageUrls, pickupImageUrls]);
 
-  // Helper function to compress image (reduced settings to avoid CloudFront 20MB limit)
-  const compressImage = (file: File, maxWidth: number = 1280, maxHeight: number = 1280, quality: number = 0.7): Promise<string> => {
+  // Helper function to compress image (aggressive compression to avoid CloudFront 20MB limit)
+  const compressImage = (file: File, maxWidth: number = 1024, maxHeight: number = 1024, quality: number = 0.6): Promise<string> => {
     return new Promise((resolve, reject) => {
       // Only compress image files
       if (!file.type.startsWith('image/')) {

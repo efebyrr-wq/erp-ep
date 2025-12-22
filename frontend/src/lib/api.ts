@@ -138,7 +138,7 @@ const EB_BASE_URL_HTTP = 'http://Deployment-erp-env-v4.eba-xspmy4pt.eu-north-1.e
 
 // Get API URL for large payloads (bypasses CloudFront)
 export function getApiUrlForLargePayload(payloadSizeMB: number): string {
-  const LARGE_PAYLOAD_THRESHOLD = 10; // Use EB for payloads > 10MB
+  const LARGE_PAYLOAD_THRESHOLD = 8; // Use EB for payloads > 8MB (more aggressive to avoid CloudFront limit)
   
   if (payloadSizeMB > LARGE_PAYLOAD_THRESHOLD && import.meta.env.MODE === 'production') {
     console.warn(`Payload size ${payloadSizeMB.toFixed(2)}MB exceeds threshold. Using Elastic Beanstalk URL directly to bypass CloudFront limit.`);
