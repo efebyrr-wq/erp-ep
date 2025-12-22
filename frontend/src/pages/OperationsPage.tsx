@@ -97,6 +97,10 @@ export default function OperationsPage() {
     imageDeliveryBundle: [] as File[],
     imagePickupBundle: [] as File[],
   });
+  
+  // Track which existing images to remove (by index)
+  const [removedDeliveryImages, setRemovedDeliveryImages] = useState<Set<number>>(new Set());
+  const [removedPickupImages, setRemovedPickupImages] = useState<Set<number>>(new Set());
 
   // Create object URLs for image previews and clean them up
   const deliveryImageUrls = useMemo(() => {
@@ -276,6 +280,8 @@ export default function OperationsPage() {
       imageDeliveryBundle: [],
       imagePickupBundle: [],
     });
+    setRemovedDeliveryImages(new Set());
+    setRemovedPickupImages(new Set());
   };
 
   const handleDetailsSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -292,13 +298,26 @@ export default function OperationsPage() {
         ? await fileToBase64(detailsForm.invoicePdf) 
         : (operationDetails?.invoicePdf || null);
 
-      const imageDeliveryBundle = detailsForm.imageDeliveryBundle.length > 0
+      // Combine new images with existing ones (excluding removed)
+      const existingDeliveryImages = operationDetails?.imageDeliveryBundle 
+        ? operationDetails.imageDeliveryBundle.filter((_, idx) => !removedDeliveryImages.has(idx))
+        : [];
+      const newDeliveryImages = detailsForm.imageDeliveryBundle.length > 0
         ? await filesToImageBundle(detailsForm.imageDeliveryBundle)
-        : (operationDetails?.imageDeliveryBundle || null);
+        : [];
+      const imageDeliveryBundle = [...existingDeliveryImages, ...newDeliveryImages].length > 0
+        ? [...existingDeliveryImages, ...newDeliveryImages]
+        : null;
 
-      const imagePickupBundle = detailsForm.imagePickupBundle.length > 0
+      const existingPickupImages = operationDetails?.imagePickupBundle 
+        ? operationDetails.imagePickupBundle.filter((_, idx) => !removedPickupImages.has(idx))
+        : [];
+      const newPickupImages = detailsForm.imagePickupBundle.length > 0
         ? await filesToImageBundle(detailsForm.imagePickupBundle)
-        : (operationDetails?.imagePickupBundle || null);
+        : [];
+      const imagePickupBundle = [...existingPickupImages, ...newPickupImages].length > 0
+        ? [...existingPickupImages, ...newPickupImages]
+        : null;
 
       const payload = {
         operationId: selectedOperationForDetails.id,
@@ -1847,8 +1866,13 @@ export default function OperationsPage() {
               accept="image/*"
               multiple
               onChange={(e) => {
-                const files = Array.from(e.target.files || []);
-                setDetailsForm((prev) => ({ ...prev, imageDeliveryBundle: files }));
+                const newFiles = Array.from(e.target.files || []);
+                setDetailsForm((prev) => ({ 
+                  ...prev, 
+                  imageDeliveryBundle: [...prev.imageDeliveryBundle, ...newFiles] 
+                }));
+                // Reset file input to allow selecting same files again
+                e.target.value = '';
               }}
             />
             {detailsForm.imageDeliveryBundle.length > 0 && (
@@ -1858,8 +1882,47 @@ export default function OperationsPage() {
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                   {detailsForm.imageDeliveryBundle.map((file, idx) => (
+                    <div key={idx} style={{ position: 'relative', display: 'inline-block' }}>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDetailsForm((prev) => ({
+                            ...prev,
+                            imageDeliveryBundle: prev.imageDeliveryBundle.filter((_, i) => i !== idx)
+                          }));
+                          // Revoke the URL for the removed image
+                          URL.revokeObjectURL(deliveryImageUrls[idx]);
+                        }}
+                        style={{
+                          position: 'absolute',
+                          top: '-8px',
+                          right: '-8px',
+                          width: '24px',
+                          height: '24px',
+                          borderRadius: '50%',
+                          background: '#ef4444',
+                          color: 'white',
+                          border: '2px solid white',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '14px',
+                          fontWeight: 'bold',
+                          zIndex: 10,
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = '#dc2626';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = '#ef4444';
+                        }}
+                      >
+                        ×
+                      </button>
                       <img
-                        key={idx}
                         src={deliveryImageUrls[idx]}
                         alt={file.name || `Delivery ${idx + 1}`}
                         onClick={() => {
@@ -1908,6 +1971,7 @@ export default function OperationsPage() {
                           e.currentTarget.style.boxShadow = 'none';
                         }}
                       />
+                    </div>
                     ))}
                 </div>
               </div>
@@ -1918,12 +1982,48 @@ export default function OperationsPage() {
                   Mevcut görüntüler ({operationDetails.imageDeliveryBundle.length}):
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                  {operationDetails.imageDeliveryBundle.map((img, idx) => (
-                    <img
-                      key={idx}
-                      src={`data:${img.mimeType};base64,${img.data}`}
-                      alt={img.filename || `Delivery ${idx + 1}`}
-                      onClick={() => {
+                  {operationDetails.imageDeliveryBundle.map((img, idx) => {
+                    if (removedDeliveryImages.has(idx)) return null;
+                    return (
+                    <div key={idx} style={{ position: 'relative', display: 'inline-block' }}>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setRemovedDeliveryImages((prev) => new Set([...prev, idx]));
+                        }}
+                        style={{
+                          position: 'absolute',
+                          top: '-8px',
+                          right: '-8px',
+                          width: '24px',
+                          height: '24px',
+                          borderRadius: '50%',
+                          background: '#ef4444',
+                          color: 'white',
+                          border: '2px solid white',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '14px',
+                          fontWeight: 'bold',
+                          zIndex: 10,
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = '#dc2626';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = '#ef4444';
+                        }}
+                      >
+                        ×
+                      </button>
+                      <img
+                        src={`data:${img.mimeType};base64,${img.data}`}
+                        alt={img.filename || `Delivery ${idx + 1}`}
+                        onClick={() => {
                         const width = window.innerWidth * 0.7;
                         const height = window.innerHeight * 0.8;
                         const left = (window.innerWidth - width) / 2;
@@ -1982,8 +2082,13 @@ export default function OperationsPage() {
               accept="image/*"
               multiple
               onChange={(e) => {
-                const files = Array.from(e.target.files || []);
-                setDetailsForm((prev) => ({ ...prev, imagePickupBundle: files }));
+                const newFiles = Array.from(e.target.files || []);
+                setDetailsForm((prev) => ({ 
+                  ...prev, 
+                  imagePickupBundle: [...prev.imagePickupBundle, ...newFiles] 
+                }));
+                // Reset file input to allow selecting same files again
+                e.target.value = '';
               }}
             />
             {detailsForm.imagePickupBundle.length > 0 && (
@@ -1993,8 +2098,47 @@ export default function OperationsPage() {
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                   {detailsForm.imagePickupBundle.map((file, idx) => (
+                    <div key={idx} style={{ position: 'relative', display: 'inline-block' }}>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDetailsForm((prev) => ({
+                            ...prev,
+                            imagePickupBundle: prev.imagePickupBundle.filter((_, i) => i !== idx)
+                          }));
+                          // Revoke the URL for the removed image
+                          URL.revokeObjectURL(pickupImageUrls[idx]);
+                        }}
+                        style={{
+                          position: 'absolute',
+                          top: '-8px',
+                          right: '-8px',
+                          width: '24px',
+                          height: '24px',
+                          borderRadius: '50%',
+                          background: '#ef4444',
+                          color: 'white',
+                          border: '2px solid white',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '14px',
+                          fontWeight: 'bold',
+                          zIndex: 10,
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = '#dc2626';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = '#ef4444';
+                        }}
+                      >
+                        ×
+                      </button>
                       <img
-                        key={idx}
                         src={pickupImageUrls[idx]}
                         alt={file.name || `Pickup ${idx + 1}`}
                         onClick={() => {
@@ -2043,6 +2187,7 @@ export default function OperationsPage() {
                           e.currentTarget.style.boxShadow = 'none';
                         }}
                       />
+                    </div>
                     ))}
                 </div>
               </div>
@@ -2050,15 +2195,51 @@ export default function OperationsPage() {
             {operationDetails?.imagePickupBundle && operationDetails.imagePickupBundle.length > 0 && (
               <div style={{ marginTop: '0.5rem' }}>
                 <div style={{ fontSize: '0.875rem', marginBottom: '0.5rem', color: '#64748b' }}>
-                  Mevcut görüntüler ({operationDetails.imagePickupBundle.length}):
+                  Mevcut görüntüler ({operationDetails.imagePickupBundle.filter((_, idx) => !removedPickupImages.has(idx)).length}):
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                  {operationDetails.imagePickupBundle.map((img, idx) => (
-                    <img
-                      key={idx}
-                      src={`data:${img.mimeType};base64,${img.data}`}
-                      alt={img.filename || `Pickup ${idx + 1}`}
-                      onClick={() => {
+                  {operationDetails.imagePickupBundle.map((img, idx) => {
+                    if (removedPickupImages.has(idx)) return null;
+                    return (
+                    <div key={idx} style={{ position: 'relative', display: 'inline-block' }}>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setRemovedPickupImages((prev) => new Set([...prev, idx]));
+                        }}
+                        style={{
+                          position: 'absolute',
+                          top: '-8px',
+                          right: '-8px',
+                          width: '24px',
+                          height: '24px',
+                          borderRadius: '50%',
+                          background: '#ef4444',
+                          color: 'white',
+                          border: '2px solid white',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '14px',
+                          fontWeight: 'bold',
+                          zIndex: 10,
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = '#dc2626';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = '#ef4444';
+                        }}
+                      >
+                        ×
+                      </button>
+                      <img
+                        src={`data:${img.mimeType};base64,${img.data}`}
+                        alt={img.filename || `Pickup ${idx + 1}`}
+                        onClick={() => {
                         const width = window.innerWidth * 0.7;
                         const height = window.innerHeight * 0.8;
                         const left = (window.innerWidth - width) / 2;
