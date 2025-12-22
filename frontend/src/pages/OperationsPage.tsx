@@ -1582,8 +1582,8 @@ export default function OperationsPage() {
                   }));
                 }}
               >
-                <option value="">Boşta Makine Seç</option>
-                {idleMachinery.map((machine) => (
+                <option value="">Makine Seç</option>
+                {machinery.map((machine) => (
                   <option key={machine.id} value={machine.machineNumber}>
                     {machine.machineNumber} - {machine.machineCode}
                   </option>
