@@ -98,8 +98,69 @@ export default function OperationsPage() {
     imagePickupBundle: [] as File[],
   });
 
-  // Helper function to convert file to base64
+  // Helper function to compress image
+  const compressImage = (file: File, maxWidth: number = 1920, maxHeight: number = 1920, quality: number = 0.8): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      // Only compress image files
+      if (!file.type.startsWith('image/')) {
+        // For non-image files (like PDFs), convert to base64 without compression
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = (reader.result as string).split(',')[1];
+          resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          // Calculate new dimensions while maintaining aspect ratio
+          if (width > maxWidth || height > maxHeight) {
+            const ratio = Math.min(maxWidth / width, maxHeight / height);
+            width = width * ratio;
+            height = height * ratio;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Could not get canvas context'));
+            return;
+          }
+
+          // Draw and compress
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Convert to base64 with compression
+          const mimeType = file.type || 'image/jpeg';
+          const compressedBase64 = canvas.toDataURL(mimeType, quality).split(',')[1];
+          resolve(compressedBase64);
+        };
+        img.onerror = reject;
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Helper function to convert file to base64 (with compression for images)
   const fileToBase64 = (file: File): Promise<string> => {
+    // Compress images, but keep PDFs as-is
+    if (file.type.startsWith('image/')) {
+      return compressImage(file);
+    }
+    // For PDFs and other files, convert without compression
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => {
@@ -111,14 +172,18 @@ export default function OperationsPage() {
     });
   };
 
-  // Helper function to convert image files to bundle format
+  // Helper function to convert image files to bundle format (with compression)
   const filesToImageBundle = async (files: File[]): Promise<Array<{ data: string; mimeType: string; filename?: string }>> => {
     const bundle = await Promise.all(
-      files.map(async (file) => ({
-        data: await fileToBase64(file),
-        mimeType: file.type,
-        filename: file.name,
-      }))
+      files.map(async (file) => {
+        // Compress images before converting to base64
+        const compressedBase64 = await compressImage(file);
+        return {
+          data: compressedBase64,
+          mimeType: file.type.startsWith('image/') ? 'image/jpeg' : file.type, // Compressed images become JPEG
+          filename: file.name,
+        };
+      })
     );
     return bundle;
   };
