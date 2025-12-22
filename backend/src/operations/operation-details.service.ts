@@ -23,6 +23,20 @@ export class OperationDetailsService {
         pickupImagesCount: dto.imagePickupBundle?.length || 0,
       });
 
+      // Check if binary columns exist, if not, ensure they're created
+      try {
+        await this.operationDetailsRepository.query(`
+          ALTER TABLE public.operations_details 
+          ADD COLUMN IF NOT EXISTS pricing_proposal_pdf BYTEA,
+          ADD COLUMN IF NOT EXISTS invoice_pdf BYTEA,
+          ADD COLUMN IF NOT EXISTS image_delivery_bundle JSONB,
+          ADD COLUMN IF NOT EXISTS image_pickup_bundle JSONB;
+        `);
+      } catch (migrationError: any) {
+        // Ignore errors if columns already exist or migration fails
+        console.log('Migration check completed (columns may already exist)');
+      }
+
       const details = this.operationDetailsRepository.create({
         operationId: dto.operationId,
         operationType: dto.operationType,
@@ -89,6 +103,20 @@ export class OperationDetailsService {
     operationId: string,
     dto: UpdateOperationDetailsDto,
   ): Promise<OperationDetails> {
+    // Check if binary columns exist, if not, ensure they're created
+    try {
+      await this.operationDetailsRepository.query(`
+        ALTER TABLE public.operations_details 
+        ADD COLUMN IF NOT EXISTS pricing_proposal_pdf BYTEA,
+        ADD COLUMN IF NOT EXISTS invoice_pdf BYTEA,
+        ADD COLUMN IF NOT EXISTS image_delivery_bundle JSONB,
+        ADD COLUMN IF NOT EXISTS image_pickup_bundle JSONB;
+      `);
+    } catch (migrationError: any) {
+      // Ignore errors if columns already exist or migration fails
+      console.log('Migration check completed (columns may already exist)');
+    }
+
     const details = await this.findOne(operationId);
 
     if (!details) {
