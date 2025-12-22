@@ -47,9 +47,28 @@ else
 fi
 
 echo ""
+echo "3️⃣ Adding binary storage columns to operations_details..."
+response3=$(curl -s -X POST "${CLOUDFRONT_URL}/database/migrate-add-binary-storage-to-operations-details" \
+  -H "Content-Type: application/json" \
+  -w "\nHTTP_STATUS:%{http_code}")
+
+http_status3=$(echo "$response3" | grep "HTTP_STATUS:" | cut -d: -f2)
+response_body3=$(echo "$response3" | grep -v "HTTP_STATUS:")
+
+if [ "$http_status3" = "200" ] || [ "$http_status3" = "201" ]; then
+  echo "✅ Migration 3 successful!"
+  echo "$response_body3" | jq '.' 2>/dev/null || echo "$response_body3"
+else
+  echo "❌ Migration 3 failed (HTTP $http_status3)"
+  echo "$response_body3"
+  exit 1
+fi
+
+echo ""
 echo "✅ All migrations completed successfully!"
 echo ""
 echo "📋 Database changes applied:"
 echo "  - Date columns converted to timestamp with time zone"
 echo "  - Removed columns from outsource_invoice_lines table"
+echo "  - Added binary storage columns to operations_details table"
 
