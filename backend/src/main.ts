@@ -12,6 +12,8 @@ async function bootstrap() {
     process.env.FRONTEND_URL,
     process.env.FRONTEND_URLS, // comma-separated list
     process.env.CORS_ORIGINS,   // comma-separated list
+    'https://main.d1054i3y445g1d.amplifyapp.com', // Amplify frontend
+    'https://*.amplifyapp.com', // All Amplify apps
   ]
     .filter(Boolean)
     .flatMap((value) =>
