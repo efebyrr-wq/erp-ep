@@ -1979,7 +1979,7 @@ export default function OperationsPage() {
             {operationDetails?.imageDeliveryBundle && operationDetails.imageDeliveryBundle.length > 0 && (
               <div style={{ marginTop: '0.5rem' }}>
                 <div style={{ fontSize: '0.875rem', marginBottom: '0.5rem', color: '#64748b' }}>
-                  Mevcut görüntüler ({operationDetails.imageDeliveryBundle.length}):
+                  Mevcut görüntüler ({operationDetails.imageDeliveryBundle.filter((_, idx) => !removedDeliveryImages.has(idx)).length}):
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                   {operationDetails.imageDeliveryBundle.map((img, idx) => {
