@@ -132,9 +132,44 @@ const createRedIcon = () => {
   });
 };
 
+// Create blue icon for outsource operations - Google Maps style location pin (blue)
+const createBlueIcon = () => {
+  return L.divIcon({
+    className: 'outsource-operation-marker',
+    html: `
+      <div style="
+        position: relative;
+        width: 0;
+        height: 0;
+      ">
+        <svg width="40" height="50" viewBox="0 0 40 50" style="
+          position: absolute;
+          left: -20px;
+          top: -50px;
+          filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        ">
+          <!-- Pin shadow -->
+          <ellipse cx="20" cy="46" rx="8" ry="3" fill="rgba(0,0,0,0.2)"/>
+          <!-- Pin body - blue color -->
+          <path d="M20 0 C9 0 0 9 0 20 C0 30 20 50 20 50 C20 50 40 30 40 20 C40 9 31 0 20 0 Z" 
+                fill="#3b82f6" 
+                stroke="#fff" 
+                stroke-width="2"/>
+          <!-- Inner circle -->
+          <circle cx="20" cy="20" r="8" fill="#fff"/>
+          <circle cx="20" cy="20" r="5" fill="#3b82f6"/>
+        </svg>
+      </div>
+    `,
+    iconSize: [40, 50],
+    iconAnchor: [20, 50], // Anchor at the bottom tip of the pin
+    popupAnchor: [0, -50],
+  });
+};
+
 // Pre-create icons for better performance
 const redIcon = createRedIcon(); // Red Google Maps style pin for internal operations
-const blueIcon = createColoredMarkerIcon('#3b82f6');
+const blueIcon = createBlueIcon(); // Blue Google Maps style pin for outsource operations
 const idleIcon = createIdleIcon(); // Orange Google Maps style pin for idle machinery
 
 // Offset markers at the same location using spiral pattern
