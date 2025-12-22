@@ -2069,7 +2069,9 @@ export default function OperationsPage() {
                         e.currentTarget.style.boxShadow = 'none';
                       }}
                     />
-                  ))}
+                    </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -2285,7 +2287,9 @@ export default function OperationsPage() {
                         e.currentTarget.style.boxShadow = 'none';
                       }}
                     />
-                  ))}
+                    </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
