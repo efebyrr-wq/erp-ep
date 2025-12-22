@@ -70,3 +70,5 @@ echo ""
 echo "🚀 You can now trigger a new build:"
 echo "   aws amplify start-job --app-id $APP_ID --branch-name staging --job-type RELEASE --region $REGION"
 
+
+

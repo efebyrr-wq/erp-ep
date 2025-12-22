@@ -459,5 +459,29 @@ export class DatabaseSetupController {
       throw error;
     }
   }
+
+  @Post('migrate-add-binary-storage-to-operations-details')
+  async migrateAddBinaryStorageToOperationsDetails() {
+    this.logger.log('Starting migration: Add binary storage columns to operations_details table...');
+    try {
+      // Add binary storage columns if they don't exist
+      await this.dataSource.query(`
+        ALTER TABLE public.operations_details 
+        ADD COLUMN IF NOT EXISTS pricing_proposal_pdf BYTEA,
+        ADD COLUMN IF NOT EXISTS invoice_pdf BYTEA,
+        ADD COLUMN IF NOT EXISTS image_delivery_bundle JSONB,
+        ADD COLUMN IF NOT EXISTS image_pickup_bundle JSONB;
+      `);
+      this.logger.log('✅ Successfully added binary storage columns to operations_details table.');
+
+      return { 
+        success: true, 
+        message: 'Binary storage columns added to operations_details table successfully.' 
+      };
+    } catch (error) {
+      this.logger.error('❌ Error during migration to add binary storage columns:', error);
+      throw error;
+    }
+  }
 }
 

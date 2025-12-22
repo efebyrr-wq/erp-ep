@@ -209,10 +209,14 @@ create table public.operations_details (
   operation_type text not null, -- 'internal', 'outsource', 'service', 'transportation'
   delivery_transportation bigint references public.transportation_operations (transportation_op_id),
   pickup_transportation bigint references public.transportation_operations (transportation_op_id),
-  pricing_proposal text, -- PDF file path/URL
-  image_delivery text, -- Image file path/URL
-  image_pickup text, -- Image file path/URL
-  invoice_operation text, -- Invoice information
+  pricing_proposal text, -- PDF file path/URL (legacy)
+  image_delivery text, -- Image file path/URL (legacy)
+  image_pickup text, -- Image file path/URL (legacy)
+  invoice_operation text, -- Invoice information (legacy)
+  pricing_proposal_pdf bytea, -- PDF binary data
+  invoice_pdf bytea, -- Invoice PDF binary data
+  image_delivery_bundle jsonb, -- Array of base64 images
+  image_pickup_bundle jsonb, -- Array of base64 images
   created_at timestamp with time zone default now(),
   updated_at timestamp with time zone default now()
 );

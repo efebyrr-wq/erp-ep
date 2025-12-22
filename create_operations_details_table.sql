@@ -32,3 +32,5 @@ CREATE INDEX IF NOT EXISTS idx_operations_details_pickup_transportation ON publi
 
 
 
+
+
