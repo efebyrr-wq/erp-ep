@@ -312,6 +312,11 @@ export default function OperationsPage() {
         imagePickupBundle: imagePickupBundle,
       };
 
+      // Check payload size (CloudFront has 20MB limit)
+      const payloadSize = JSON.stringify(payload).length;
+      const payloadSizeMB = payloadSize / (1024 * 1024);
+      const maxSizeMB = 18; // Leave 2MB buffer for CloudFront
+
       console.log('Saving operation details:', {
         operationId: payload.operationId,
         operationType: payload.operationType,
@@ -319,7 +324,17 @@ export default function OperationsPage() {
         hasInvoicePdf: !!payload.invoicePdf,
         deliveryImagesCount: payload.imageDeliveryBundle?.length || 0,
         pickupImagesCount: payload.imagePickupBundle?.length || 0,
+        payloadSizeMB: payloadSizeMB.toFixed(2),
       });
+
+      if (payloadSizeMB > maxSizeMB) {
+        alert(
+          `Uyarı: Yüklenen dosyalar çok büyük (${payloadSizeMB.toFixed(2)} MB). ` +
+          `Maksimum ${maxSizeMB} MB olmalıdır. ` +
+          `Lütfen daha az görüntü seçin veya görüntü boyutlarını küçültün.`
+        );
+        return;
+      }
 
       let savedDetails: OperationDetails | null;
       if (operationDetails) {
