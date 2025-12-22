@@ -313,8 +313,28 @@ export default function OperationsPage() {
       };
 
       // Check payload size (CloudFront has 20MB limit)
-      const payloadSize = JSON.stringify(payload).length;
-      const payloadSizeMB = payloadSize / (1024 * 1024);
+      // Calculate actual size including base64 overhead
+      let totalSize = 0;
+      if (pricingProposalPdfBase64) {
+        totalSize += pricingProposalPdfBase64.length * 0.75; // Base64 is ~33% larger than binary
+      }
+      if (invoicePdfBase64) {
+        totalSize += invoicePdfBase64.length * 0.75;
+      }
+      if (imageDeliveryBundle) {
+        imageDeliveryBundle.forEach(img => {
+          totalSize += img.data.length * 0.75;
+        });
+      }
+      if (imagePickupBundle) {
+        imagePickupBundle.forEach(img => {
+          totalSize += img.data.length * 0.75;
+        });
+      }
+      // Add overhead for JSON structure (estimate ~1KB)
+      totalSize += 1024;
+      
+      const payloadSizeMB = totalSize / (1024 * 1024);
       const maxSizeMB = 18; // Leave 2MB buffer for CloudFront
 
       console.log('Saving operation details:', {
@@ -325,14 +345,19 @@ export default function OperationsPage() {
         deliveryImagesCount: payload.imageDeliveryBundle?.length || 0,
         pickupImagesCount: payload.imagePickupBundle?.length || 0,
         payloadSizeMB: payloadSizeMB.toFixed(2),
+        pricingPdfSize: pricingProposalPdfBase64 ? `${(pricingProposalPdfBase64.length / (1024 * 1024)).toFixed(2)} MB` : '0 MB',
+        invoicePdfSize: invoicePdfBase64 ? `${(invoicePdfBase64.length / (1024 * 1024)).toFixed(2)} MB` : '0 MB',
       });
 
       if (payloadSizeMB > maxSizeMB) {
-        alert(
+        const message = 
           `Uyarı: Yüklenen dosyalar çok büyük (${payloadSizeMB.toFixed(2)} MB). ` +
-          `Maksimum ${maxSizeMB} MB olmalıdır. ` +
-          `Lütfen daha az görüntü seçin veya görüntü boyutlarını küçültün.`
-        );
+          `Maksimum ${maxSizeMB} MB olmalıdır.\n\n` +
+          `Lütfen:\n` +
+          `- Daha az görüntü seçin\n` +
+          `- PDF dosyalarını küçültün\n` +
+          `- Görüntüleri daha küçük boyutlarda yükleyin`;
+        alert(message);
         return;
       }
 
