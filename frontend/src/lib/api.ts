@@ -131,6 +131,26 @@ export async function apiDelete<TOutput = undefined>(
   }
 }
 
+// Elastic Beanstalk URL for large uploads (bypasses CloudFront 20MB limit)
+// Try HTTPS first (if EB has SSL certificate), fallback to HTTP
+const EB_BASE_URL_HTTPS = 'https://Deployment-erp-env-v4.eba-xspmy4pt.eu-north-1.elasticbeanstalk.com';
+const EB_BASE_URL_HTTP = 'http://Deployment-erp-env-v4.eba-xspmy4pt.eu-north-1.elasticbeanstalk.com';
+
+// Get API URL for large payloads (bypasses CloudFront)
+export function getApiUrlForLargePayload(payloadSizeMB: number): string {
+  const LARGE_PAYLOAD_THRESHOLD = 10; // Use EB for payloads > 10MB
+  
+  if (payloadSizeMB > LARGE_PAYLOAD_THRESHOLD && import.meta.env.MODE === 'production') {
+    console.warn(`Payload size ${payloadSizeMB.toFixed(2)}MB exceeds threshold. Using Elastic Beanstalk URL directly to bypass CloudFront limit.`);
+    // Try HTTPS first (if available), otherwise use HTTP
+    // Note: If HTTPS is not available, browser will block due to mixed content policy
+    // In that case, EB environment needs to be configured with HTTPS listener
+    return EB_BASE_URL_HTTPS;
+  }
+  
+  return API_BASE_URL;
+}
+
 export { API_BASE_URL };
 
 
