@@ -1786,8 +1786,67 @@ export default function OperationsPage() {
               }}
             />
             {detailsForm.imageDeliveryBundle.length > 0 && (
-              <div style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: '#64748b' }}>
-                {detailsForm.imageDeliveryBundle.length} dosya seçildi
+              <div style={{ marginTop: '0.5rem' }}>
+                <div style={{ fontSize: '0.875rem', marginBottom: '0.5rem', color: '#64748b' }}>
+                  Yeni seçilen görüntüler ({detailsForm.imageDeliveryBundle.length}):
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  {detailsForm.imageDeliveryBundle.map((file, idx) => {
+                    const previewUrl = URL.createObjectURL(file);
+                    return (
+                      <img
+                        key={idx}
+                        src={previewUrl}
+                        alt={file.name || `Delivery ${idx + 1}`}
+                        onClick={() => {
+                          const width = window.innerWidth * 0.7;
+                          const height = window.innerHeight * 0.8;
+                          const left = (window.innerWidth - width) / 2;
+                          const top = (window.innerHeight - height) / 2;
+                          const popup = window.open(
+                            '',
+                            `newImageViewer_delivery_${idx}`,
+                            `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+                          );
+                          if (popup) {
+                            popup.document.write(`
+                              <html>
+                                <head>
+                                  <title>${file.name || `Delivery Image ${idx + 1}`}</title>
+                                  <style>
+                                    body { margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; background: #f5f5f5; }
+                                    img { max-width: 100%; max-height: 100%; object-fit: contain; }
+                                  </style>
+                                </head>
+                                <body>
+                                  <img src="${previewUrl}" alt="${file.name || `Delivery ${idx + 1}`}" />
+                                </body>
+                              </html>
+                            `);
+                            popup.document.close();
+                          }
+                        }}
+                        style={{ 
+                          maxWidth: '100px', 
+                          maxHeight: '100px', 
+                          objectFit: 'contain', 
+                          border: '1px solid #e2e8f0', 
+                          borderRadius: '0.25rem',
+                          cursor: 'pointer',
+                          transition: 'transform 0.2s'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'scale(1.05)';
+                          e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'scale(1)';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                      />
+                    );
+                  })}
+                </div>
               </div>
             )}
             {operationDetails?.imageDeliveryBundle && operationDetails.imageDeliveryBundle.length > 0 && (
@@ -1865,8 +1924,67 @@ export default function OperationsPage() {
               }}
             />
             {detailsForm.imagePickupBundle.length > 0 && (
-              <div style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: '#64748b' }}>
-                {detailsForm.imagePickupBundle.length} dosya seçildi
+              <div style={{ marginTop: '0.5rem' }}>
+                <div style={{ fontSize: '0.875rem', marginBottom: '0.5rem', color: '#64748b' }}>
+                  Yeni seçilen görüntüler ({detailsForm.imagePickupBundle.length}):
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  {detailsForm.imagePickupBundle.map((file, idx) => {
+                    const previewUrl = URL.createObjectURL(file);
+                    return (
+                      <img
+                        key={idx}
+                        src={previewUrl}
+                        alt={file.name || `Pickup ${idx + 1}`}
+                        onClick={() => {
+                          const width = window.innerWidth * 0.7;
+                          const height = window.innerHeight * 0.8;
+                          const left = (window.innerWidth - width) / 2;
+                          const top = (window.innerHeight - height) / 2;
+                          const popup = window.open(
+                            '',
+                            `newImageViewer_pickup_${idx}`,
+                            `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+                          );
+                          if (popup) {
+                            popup.document.write(`
+                              <html>
+                                <head>
+                                  <title>${file.name || `Pickup Image ${idx + 1}`}</title>
+                                  <style>
+                                    body { margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; background: #f5f5f5; }
+                                    img { max-width: 100%; max-height: 100%; object-fit: contain; }
+                                  </style>
+                                </head>
+                                <body>
+                                  <img src="${previewUrl}" alt="${file.name || `Pickup ${idx + 1}`}" />
+                                </body>
+                              </html>
+                            `);
+                            popup.document.close();
+                          }
+                        }}
+                        style={{ 
+                          maxWidth: '100px', 
+                          maxHeight: '100px', 
+                          objectFit: 'contain', 
+                          border: '1px solid #e2e8f0', 
+                          borderRadius: '0.25rem',
+                          cursor: 'pointer',
+                          transition: 'transform 0.2s'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'scale(1.05)';
+                          e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'scale(1)';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                      />
+                    );
+                  })}
+                </div>
               </div>
             )}
             {operationDetails?.imagePickupBundle && operationDetails.imagePickupBundle.length > 0 && (
