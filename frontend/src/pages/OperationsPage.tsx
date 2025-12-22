@@ -365,9 +365,12 @@ export default function OperationsPage() {
       if (operationDetails) {
         // Update existing
         console.log('Updating existing operation details');
+        // Use large payload URL if payload is > 10MB (before CloudFront limit)
+        const useLargePayloadUrl = payloadSizeMB > 10;
         savedDetails = await apiPatch<typeof payload, OperationDetails>(
           `/operation-details/${selectedOperationForDetails.id}`,
           payload,
+          useLargePayloadUrl,
         );
       } else {
         // Create new

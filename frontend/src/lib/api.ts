@@ -68,9 +68,18 @@ export async function apiPost<TInput extends Record<string, unknown>, TOutput>(
 export async function apiPatch<TInput extends Record<string, unknown>, TOutput>(
   path: string,
   payload?: TInput,
+  useLargePayloadUrl?: boolean,
 ): Promise<TOutput | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}${path}`, {
+    // Calculate payload size if provided
+    let apiUrl = API_BASE_URL;
+    if (useLargePayloadUrl && payload) {
+      const payloadSize = JSON.stringify(payload).length;
+      const payloadSizeMB = payloadSize / (1024 * 1024);
+      apiUrl = getApiUrlForLargePayload(payloadSizeMB);
+    }
+    
+    const response = await fetch(`${apiUrl}${path}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: payload ? JSON.stringify(payload) : undefined,
