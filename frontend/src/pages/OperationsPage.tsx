@@ -375,7 +375,13 @@ export default function OperationsPage() {
       } else {
         // Create new
         console.log('Creating new operation details');
-        savedDetails = await apiPost<typeof payload, OperationDetails>('/operation-details', payload);
+        // Use large payload URL if payload is > 10MB (before CloudFront limit)
+        const useLargePayloadUrl = payloadSizeMB > 10;
+        savedDetails = await apiPost<typeof payload, OperationDetails>(
+          '/operation-details',
+          payload,
+          useLargePayloadUrl,
+        );
       }
 
       if (!savedDetails) {

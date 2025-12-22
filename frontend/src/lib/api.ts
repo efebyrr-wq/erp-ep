@@ -36,11 +36,20 @@ export async function apiGet<T>(path: string, fallback: T): Promise<T> {
 export async function apiPost<TInput extends Record<string, unknown>, TOutput>(
   path: string,
   payload: TInput,
+  useLargePayloadUrl?: boolean,
 ): Promise<TOutput | null> {
-  console.log(`[apiPost] Making POST request to: ${API_BASE_URL}${path}`);
+  // Calculate payload size if needed
+  let apiUrl = API_BASE_URL;
+  if (useLargePayloadUrl) {
+    const payloadSize = JSON.stringify(payload).length;
+    const payloadSizeMB = payloadSize / (1024 * 1024);
+    apiUrl = getApiUrlForLargePayload(payloadSizeMB);
+  }
+  
+  console.log(`[apiPost] Making POST request to: ${apiUrl}${path}`);
   console.log(`[apiPost] Payload:`, JSON.stringify(payload, null, 2));
   try {
-    const response = await fetch(`${API_BASE_URL}${path}`, {
+    const response = await fetch(`${apiUrl}${path}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
