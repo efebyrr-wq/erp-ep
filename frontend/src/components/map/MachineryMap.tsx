@@ -436,7 +436,12 @@ const WorkingSiteMarker = memo(function WorkingSiteMarker({
     }
     // Fallback: try to parse location string
     const parsed = parseLocation(site.location || '');
-    return parsed || DEFAULT_CENTER;
+    if (parsed) {
+      return parsed;
+    }
+    // If no coordinates and can't parse location, use default center so marker is still visible
+    console.warn(`[WorkingSiteMarker] Working site "${site.workingSiteName}" has no coordinates, using default center`);
+    return DEFAULT_CENTER;
   }, [site.location, site.latitude, site.longitude]);
   
   return (
@@ -446,6 +451,12 @@ const WorkingSiteMarker = memo(function WorkingSiteMarker({
           <strong>{site.workingSiteName}</strong>
           <br />
           Location: {site.location || 'N/A'}
+          {(!site.latitude || !site.longitude) && (
+            <>
+              <br />
+              <em style={{ color: '#ef4444', fontSize: '0.875rem' }}>⚠️ No coordinates - showing at default location</em>
+            </>
+          )}
         </div>
       </Popup>
     </Marker>
@@ -458,6 +469,7 @@ function MapMarkers({
   outsourceOps,
   workingSites,
   activeMachinery,
+  filterWorkingSiteName,
 }: {
   internalOps: InternalOperation[];
   outsourceOps: OutsourceOperation[];
@@ -471,11 +483,32 @@ function MapMarkers({
     longitude?: string | null;
     createdAt?: string;
   }>;
+  filterWorkingSiteName?: string | null;
 }) {
+  // Filter operations by working site name if filter is provided
+  const filteredInternalOps = useMemo(() => {
+    if (!filterWorkingSiteName) return internalOps;
+    const filterLower = filterWorkingSiteName.toLowerCase();
+    return internalOps.filter(op => 
+      op.workingSiteName?.toLowerCase().includes(filterLower)
+    );
+  }, [internalOps, filterWorkingSiteName]);
+
+  const filteredOutsourceOps = useMemo(() => {
+    if (!filterWorkingSiteName) return outsourceOps;
+    const filterLower = filterWorkingSiteName.toLowerCase();
+    return outsourceOps.filter(op => 
+      op.workingSiteName?.toLowerCase().includes(filterLower)
+    );
+  }, [outsourceOps, filterWorkingSiteName]);
+
   // Group operations by location (from working sites)
   const operationMarkers = useMemo(() => {
     console.log(`[MapMarkers] ===== Starting marker generation =====`);
-    console.log(`[MapMarkers] Input: ${internalOps.length} internal ops, ${outsourceOps.length} outsource ops, ${workingSites.length} working sites`);
+    console.log(`[MapMarkers] Input: ${filteredInternalOps.length} internal ops (filtered from ${internalOps.length}), ${filteredOutsourceOps.length} outsource ops (filtered from ${outsourceOps.length}), ${workingSites.length} working sites`);
+    if (filterWorkingSiteName) {
+      console.log(`[MapMarkers] Filtering by working site: "${filterWorkingSiteName}"`);
+    }
     const markers: React.ReactElement[] = [];
     const locationMap = new Map<string, Array<{ type: 'internal' | 'outsource'; op: InternalOperation | OutsourceOperation }>>();
     
@@ -510,7 +543,7 @@ function MapMarkers({
     
     // Group internal operations by their working site coordinates
     // Only show operations without endDate (active operations)
-    const activeInternalOps = internalOps.filter(op => !op.endDate || op.endDate === '');
+    const activeInternalOps = filteredInternalOps.filter(op => !op.endDate || op.endDate === '');
     console.log(`[MapMarkers] Processing ${activeInternalOps.length} active internal operations`);
     
     activeInternalOps.forEach((op) => {
@@ -551,7 +584,7 @@ function MapMarkers({
     
     // Group outsource operations by their working site coordinates
     // Only show operations without endDate (active operations)
-    const activeOutsourceOps = outsourceOps.filter(op => !op.endDate || op.endDate === '');
+    const activeOutsourceOps = filteredOutsourceOps.filter(op => !op.endDate || op.endDate === '');
     console.log(`[MapMarkers] Processing ${activeOutsourceOps.length} active outsource operations`);
     
     activeOutsourceOps.forEach((op) => {
@@ -619,7 +652,7 @@ function MapMarkers({
     console.log(`[MapMarkers] Breakdown: ${markers.filter(m => m.key?.toString().startsWith('internal')).length} internal, ${markers.filter(m => m.key?.toString().startsWith('outsource')).length} outsource`);
     console.log(`[MapMarkers] ===== Finished marker generation =====`);
     return markers;
-  }, [internalOps, outsourceOps, workingSites]);
+  }, [filteredInternalOps, filteredOutsourceOps, workingSites, filterWorkingSiteName]);
   
   // Create machinery markers for IDLE machinery and ACTIVE machinery without operations
   const machineryMarkers = useMemo(() => {
@@ -627,12 +660,12 @@ function MapMarkers({
     
     // Get machine numbers that are in active operations (without endDate) to avoid duplicates
     const activeMachineNumbers = new Set<string>();
-    internalOps
+    filteredInternalOps
       .filter(op => !op.endDate || op.endDate === '')
       .forEach(op => {
         if (op.machineNumber) activeMachineNumbers.add(op.machineNumber);
       });
-    outsourceOps
+    filteredOutsourceOps
       .filter(op => !op.endDate || op.endDate === '')
       .forEach(op => {
       if (op.machineCode) {
@@ -675,8 +708,8 @@ function MapMarkers({
       if (isActive) {
         // Find operation for this machinery to get working site
         const operation = 
-          internalOps.find(op => op.machineNumber === machine.machineNumber && (!op.endDate || op.endDate === '')) ||
-          outsourceOps.find(op => op.machineCode === machine.machineCode && (!op.endDate || op.endDate === ''));
+          filteredInternalOps.find(op => op.machineNumber === machine.machineNumber && (!op.endDate || op.endDate === '')) ||
+          filteredOutsourceOps.find(op => op.machineCode === machine.machineCode && (!op.endDate || op.endDate === ''));
         
         if (operation && operation.workingSiteName) {
           // Find working site coordinates
@@ -793,20 +826,32 @@ function MapMarkers({
     });
     
     return markers;
-  }, [activeMachinery, internalOps, outsourceOps, workingSites]);
+  }, [activeMachinery, filteredInternalOps, filteredOutsourceOps, workingSites, filterWorkingSiteName]);
   
-  // Create working site markers
+  // Create working site markers - filter by search query if provided
   const siteMarkers = useMemo(() => {
-    return workingSites.map((site) => (
-      <WorkingSiteMarker key={`site-${site.id}`} site={site} />
-    ));
-  }, [workingSites]);
+    let sitesToShow = workingSites;
+    if (filterWorkingSiteName) {
+      const filterLower = filterWorkingSiteName.toLowerCase();
+      sitesToShow = workingSites.filter(site =>
+        site.workingSiteName.toLowerCase().includes(filterLower)
+      );
+    }
+    return sitesToShow.map((site) => {
+      // Ensure site has coordinates or can parse location
+      const hasCoords = (site.latitude && site.longitude) || parseLocation(site.location || '');
+      if (!hasCoords) {
+        console.warn(`[MapMarkers] Working site "${site.workingSiteName}" has no coordinates and location cannot be parsed`);
+      }
+      return <WorkingSiteMarker key={`site-${site.id}`} site={site} />;
+    });
+  }, [workingSites, filterWorkingSiteName]);
   
   return (
     <>
       {operationMarkers}
       {machineryMarkers}
-      {/* Working site markers removed - only show machinery locations */}
+      {siteMarkers}
     </>
   );
 }
@@ -980,6 +1025,7 @@ export function MachineryMap({
           outsourceOps={outsourceOps}
           workingSites={workingSites}
           activeMachinery={activeMachinery}
+          filterWorkingSiteName={activeWorkingSiteName}
         />
         
         {!hideLegend && (
