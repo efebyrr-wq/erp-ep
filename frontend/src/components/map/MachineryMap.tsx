@@ -444,6 +444,7 @@ function MapMarkers({
     
     // Create a map of working site names to coordinates
     const siteCoordsMap = new Map<string, [number, number]>();
+    console.log(`[MapMarkers] Processing ${workingSites.length} working sites`);
     workingSites.forEach((site) => {
       if (site.workingSiteName) {
         // Use coordinates if available, otherwise try to parse location string
@@ -452,53 +453,81 @@ function MapMarkers({
           const lon = parseFloat(site.longitude);
           if (!isNaN(lat) && !isNaN(lon)) {
             siteCoordsMap.set(site.workingSiteName, [lat, lon]);
+            console.log(`[MapMarkers] Added working site "${site.workingSiteName}" with coordinates [${lat}, ${lon}]`);
           }
         } else if (site.location) {
           // Fallback: try to parse location string as coordinates
           const coords = parseLocation(site.location);
           if (coords) {
             siteCoordsMap.set(site.workingSiteName, coords);
+            console.log(`[MapMarkers] Added working site "${site.workingSiteName}" with parsed coordinates [${coords[0]}, ${coords[1]}]`);
+          } else {
+            console.warn(`[MapMarkers] Working site "${site.workingSiteName}" has location "${site.location}" but couldn't parse as coordinates`);
           }
+        } else {
+          console.warn(`[MapMarkers] Working site "${site.workingSiteName}" has no latitude/longitude or location string`);
         }
       }
     });
+    console.log(`[MapMarkers] Created siteCoordsMap with ${siteCoordsMap.size} entries`);
     
     // Group internal operations by their working site coordinates
     // Only show operations without endDate (active operations)
-    internalOps
-      .filter(op => !op.endDate || op.endDate === '')
-      .forEach((op) => {
-        if (!op.workingSiteName) return;
-        const coords = siteCoordsMap.get(op.workingSiteName);
-        if (!coords) return;
-      
+    const activeInternalOps = internalOps.filter(op => !op.endDate || op.endDate === '');
+    console.log(`[MapMarkers] Processing ${activeInternalOps.length} active internal operations`);
+    
+    activeInternalOps.forEach((op) => {
+      if (!op.workingSiteName) {
+        console.warn(`[MapMarkers] Internal operation ${op.id} has no workingSiteName, skipping`);
+        return;
+      }
+      const coords = siteCoordsMap.get(op.workingSiteName);
+      if (!coords) {
+        console.warn(`[MapMarkers] Internal operation ${op.id} has workingSiteName "${op.workingSiteName}" but no coordinates found in working sites`);
+        return;
+      }
+    
       const coordsKey = `${coords[0]},${coords[1]}`;
       if (!locationMap.has(coordsKey)) {
         locationMap.set(coordsKey, []);
       }
       locationMap.get(coordsKey)!.push({ type: 'internal', op });
+      console.log(`[MapMarkers] Added internal operation ${op.id} at ${coordsKey}`);
     });
     
     // Group outsource operations by their working site coordinates
     // Only show operations without endDate (active operations)
-    outsourceOps
-      .filter(op => !op.endDate || op.endDate === '')
-      .forEach((op) => {
-        if (!op.workingSiteName) return;
-        const coords = siteCoordsMap.get(op.workingSiteName);
-        if (!coords) return;
-      
+    const activeOutsourceOps = outsourceOps.filter(op => !op.endDate || op.endDate === '');
+    console.log(`[MapMarkers] Processing ${activeOutsourceOps.length} active outsource operations`);
+    
+    activeOutsourceOps.forEach((op) => {
+      if (!op.workingSiteName) {
+        console.warn(`[MapMarkers] Outsource operation ${op.id} has no workingSiteName, skipping`);
+        return;
+      }
+      const coords = siteCoordsMap.get(op.workingSiteName);
+      if (!coords) {
+        console.warn(`[MapMarkers] Outsource operation ${op.id} has workingSiteName "${op.workingSiteName}" but no coordinates found in working sites`);
+        return;
+      }
+    
       const coordsKey = `${coords[0]},${coords[1]}`;
       if (!locationMap.has(coordsKey)) {
         locationMap.set(coordsKey, []);
       }
       locationMap.get(coordsKey)!.push({ type: 'outsource', op });
+      console.log(`[MapMarkers] Added outsource operation ${op.id} at ${coordsKey}`);
     });
     
     // Create markers with offsets
     locationMap.forEach((ops, coordsKey) => {
       const coords = parseLocation(coordsKey);
-      if (!coords) return;
+      if (!coords) {
+        console.warn(`[MapMarkers] Could not parse coordsKey "${coordsKey}"`);
+        return;
+      }
+      
+      console.log(`[MapMarkers] Creating ${ops.length} markers at ${coordsKey} (${ops.filter(o => o.type === 'internal').length} internal, ${ops.filter(o => o.type === 'outsource').length} outsource)`);
       
       ops.forEach((opWithType, index) => {
         const offsetCoords = offsetMarkerPosition(coords, index, ops.length);
@@ -514,6 +543,7 @@ function MapMarkers({
       });
     });
     
+    console.log(`[MapMarkers] Created ${markers.length} operation markers total`);
     return markers;
   }, [internalOps, outsourceOps, workingSites]);
   

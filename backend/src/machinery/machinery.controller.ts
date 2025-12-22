@@ -40,19 +40,7 @@ export class MachineryController {
     return this.machineryService.removeSpec(specId);
   }
 
-  @Patch(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateMachineryDto: UpdateMachineryDto,
-  ): Promise<Machinery> {
-    return this.machineryService.update(id, updateMachineryDto);
-  }
-
-  @Delete(':id')
-  async remove(@Param('id') id: string): Promise<void> {
-    return this.machineryService.remove(id);
-  }
-
+  // Specific routes must come before generic :id routes
   @Patch(':machineNumber/coordinates')
   async updateCoordinates(
     @Param('machineNumber') machineNumber: string,
@@ -73,6 +61,36 @@ export class MachineryController {
       body.longitude,
     );
     return { message: `Updated coordinates for ${machineNumber}` };
+  }
+
+  @Patch(':machineNumber/status')
+  async updateStatus(
+    @Param('machineNumber') machineNumber: string,
+    @Body() body: { status: string; latitude?: string; longitude?: string },
+  ): Promise<{ message: string; machinery: Machinery | null }> {
+    const machinery = await this.machineryService.updateMachineryStatusAndLocation(
+      machineNumber,
+      body.status || null,
+      body.latitude || null,
+      body.longitude || null,
+    );
+    return { 
+      message: `Updated status for ${machineNumber} to ${body.status || 'null'}`,
+      machinery 
+    };
+  }
+
+  @Patch(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateMachineryDto: UpdateMachineryDto,
+  ): Promise<Machinery> {
+    return this.machineryService.update(id, updateMachineryDto);
+  }
+
+  @Delete(':id')
+  async remove(@Param('id') id: string): Promise<void> {
+    return this.machineryService.remove(id);
   }
 }
 
