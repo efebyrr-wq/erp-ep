@@ -483,10 +483,27 @@ function MapMarkers({
         console.warn(`[MapMarkers] Internal operation ${op.id} has no workingSiteName, skipping`);
         return;
       }
-      const coords = siteCoordsMap.get(op.workingSiteName);
+      let coords = siteCoordsMap.get(op.workingSiteName);
+      
+      // Fallback: if no coordinates in map, try to find the working site and parse its location
       if (!coords) {
-        console.warn(`[MapMarkers] Internal operation ${op.id} has workingSiteName "${op.workingSiteName}" but no coordinates found in working sites`);
-        return;
+        const site = workingSites.find(s => s.workingSiteName === op.workingSiteName);
+        if (site) {
+          // Try to parse location string as coordinates
+          if (site.location) {
+            const parsed = parseLocation(site.location);
+            if (parsed) {
+              coords = parsed;
+              console.log(`[MapMarkers] Parsed coordinates from location string for "${op.workingSiteName}": [${coords[0]}, ${coords[1]}]`);
+            }
+          }
+        }
+        
+        if (!coords) {
+          // Internal operations: skip if no coordinates (they have machinery markers as fallback)
+          console.warn(`[MapMarkers] Internal operation ${op.id} has workingSiteName "${op.workingSiteName}" but no coordinates found. Skipping.`);
+          return;
+        }
       }
     
       const coordsKey = `${coords[0]},${coords[1]}`;
@@ -507,10 +524,28 @@ function MapMarkers({
         console.warn(`[MapMarkers] Outsource operation ${op.id} has no workingSiteName, skipping`);
         return;
       }
-      const coords = siteCoordsMap.get(op.workingSiteName);
+      let coords = siteCoordsMap.get(op.workingSiteName);
+      
+      // Fallback: if no coordinates in map, try to find the working site and parse its location
       if (!coords) {
-        console.warn(`[MapMarkers] Outsource operation ${op.id} has workingSiteName "${op.workingSiteName}" but no coordinates found in working sites`);
-        return;
+        const site = workingSites.find(s => s.workingSiteName === op.workingSiteName);
+        if (site) {
+          // Try to parse location string as coordinates
+          if (site.location) {
+            const parsed = parseLocation(site.location);
+            if (parsed) {
+              coords = parsed;
+              console.log(`[MapMarkers] Parsed coordinates from location string for "${op.workingSiteName}": [${coords[0]}, ${coords[1]}]`);
+            }
+          }
+        }
+        
+        if (!coords) {
+          console.warn(`[MapMarkers] Outsource operation ${op.id} has workingSiteName "${op.workingSiteName}" but no coordinates found. Site exists: ${site ? 'yes' : 'no'}, location: ${site?.location || 'N/A'}`);
+          // Don't skip - use a default location so operations are still visible
+          coords = DEFAULT_CENTER;
+          console.log(`[MapMarkers] Using default center [${coords[0]}, ${coords[1]}] for outsource operation ${op.id}`);
+        }
       }
     
       const coordsKey = `${coords[0]},${coords[1]}`;
