@@ -439,6 +439,8 @@ function MapMarkers({
 }) {
   // Group operations by location (from working sites)
   const operationMarkers = useMemo(() => {
+    console.log(`[MapMarkers] ===== Starting marker generation =====`);
+    console.log(`[MapMarkers] Input: ${internalOps.length} internal ops, ${outsourceOps.length} outsource ops, ${workingSites.length} working sites`);
     const markers: React.ReactElement[] = [];
     const locationMap = new Map<string, Array<{ type: 'internal' | 'outsource'; op: InternalOperation | OutsourceOperation }>>();
     
@@ -544,6 +546,8 @@ function MapMarkers({
     });
     
     console.log(`[MapMarkers] Created ${markers.length} operation markers total`);
+    console.log(`[MapMarkers] Breakdown: ${markers.filter(m => m.key?.toString().startsWith('internal')).length} internal, ${markers.filter(m => m.key?.toString().startsWith('outsource')).length} outsource`);
+    console.log(`[MapMarkers] ===== Finished marker generation =====`);
     return markers;
   }, [internalOps, outsourceOps, workingSites]);
   
