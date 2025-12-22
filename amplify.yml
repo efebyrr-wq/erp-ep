@@ -14,13 +14,37 @@ frontend:
         - 'echo "Building frontend for branch: $AWS_BRANCH"'
         - 'echo "Current directory: $(pwd)"'
         - 'echo "Listing files: $(ls -la)"'
-        - cd frontend
-        - npm install
+        - |
+          if [ -d "frontend" ]; then
+            cd frontend
+            echo "Changed to frontend directory"
+          else
+            echo "Already in frontend directory or frontend folder not found"
+          fi
+        - 'echo "Current directory after cd: $(pwd)"'
+        - 'echo "VITE_API_BASE_URL=$VITE_API_BASE_URL"'
+        - npm ci
     build:
       commands:
+        - |
+          if [ -d "frontend" ]; then
+            cd frontend
+          fi
         - 'echo "Build phase - Current directory: $(pwd)"'
+        - 'echo "VITE_API_BASE_URL=$VITE_API_BASE_URL"'
         - npm run build
         - echo "Build completed successfully"
+        - |
+          if [ -d "frontend/dist" ]; then
+            echo "Build output in frontend/dist"
+            ls -la frontend/dist/ | head -10
+          elif [ -d "dist" ]; then
+            echo "Build output in dist"
+            ls -la dist/ | head -10
+          else
+            echo "⚠️ Warning: dist folder not found!"
+            ls -la
+          fi
   artifacts:
     baseDirectory: frontend/dist
     files:
