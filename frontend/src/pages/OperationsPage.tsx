@@ -98,6 +98,23 @@ export default function OperationsPage() {
     imagePickupBundle: [] as File[],
   });
 
+  // Create object URLs for image previews and clean them up
+  const deliveryImageUrls = useMemo(() => {
+    return detailsForm.imageDeliveryBundle.map(file => URL.createObjectURL(file));
+  }, [detailsForm.imageDeliveryBundle]);
+
+  const pickupImageUrls = useMemo(() => {
+    return detailsForm.imagePickupBundle.map(file => URL.createObjectURL(file));
+  }, [detailsForm.imagePickupBundle]);
+
+  // Cleanup object URLs when component unmounts or files change
+  useEffect(() => {
+    return () => {
+      deliveryImageUrls.forEach(url => URL.revokeObjectURL(url));
+      pickupImageUrls.forEach(url => URL.revokeObjectURL(url));
+    };
+  }, [deliveryImageUrls, pickupImageUrls]);
+
   // Helper function to compress image
   const compressImage = (file: File, maxWidth: number = 1920, maxHeight: number = 1920, quality: number = 0.8): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -1791,12 +1808,10 @@ export default function OperationsPage() {
                   Yeni seçilen görüntüler ({detailsForm.imageDeliveryBundle.length}):
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                  {detailsForm.imageDeliveryBundle.map((file, idx) => {
-                    const previewUrl = URL.createObjectURL(file);
-                    return (
+                  {detailsForm.imageDeliveryBundle.map((file, idx) => (
                       <img
                         key={idx}
-                        src={previewUrl}
+                        src={deliveryImageUrls[idx]}
                         alt={file.name || `Delivery ${idx + 1}`}
                         onClick={() => {
                           const width = window.innerWidth * 0.7;
@@ -1819,7 +1834,7 @@ export default function OperationsPage() {
                                   </style>
                                 </head>
                                 <body>
-                                  <img src="${previewUrl}" alt="${file.name || `Delivery ${idx + 1}`}" />
+                                  <img src="${deliveryImageUrls[idx]}" alt="${file.name || `Delivery ${idx + 1}`}" />
                                 </body>
                               </html>
                             `);
@@ -1844,8 +1859,7 @@ export default function OperationsPage() {
                           e.currentTarget.style.boxShadow = 'none';
                         }}
                       />
-                    );
-                  })}
+                    ))}
                 </div>
               </div>
             )}
@@ -1929,12 +1943,10 @@ export default function OperationsPage() {
                   Yeni seçilen görüntüler ({detailsForm.imagePickupBundle.length}):
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                  {detailsForm.imagePickupBundle.map((file, idx) => {
-                    const previewUrl = URL.createObjectURL(file);
-                    return (
+                  {detailsForm.imagePickupBundle.map((file, idx) => (
                       <img
                         key={idx}
-                        src={previewUrl}
+                        src={pickupImageUrls[idx]}
                         alt={file.name || `Pickup ${idx + 1}`}
                         onClick={() => {
                           const width = window.innerWidth * 0.7;
@@ -1957,7 +1969,7 @@ export default function OperationsPage() {
                                   </style>
                                 </head>
                                 <body>
-                                  <img src="${previewUrl}" alt="${file.name || `Pickup ${idx + 1}`}" />
+                                  <img src="${pickupImageUrls[idx]}" alt="${file.name || `Pickup ${idx + 1}`}" />
                                 </body>
                               </html>
                             `);
@@ -1982,8 +1994,7 @@ export default function OperationsPage() {
                           e.currentTarget.style.boxShadow = 'none';
                         }}
                       />
-                    );
-                  })}
+                    ))}
                 </div>
               </div>
             )}
