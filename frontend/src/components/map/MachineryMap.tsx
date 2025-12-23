@@ -134,6 +134,7 @@ const createRedIcon = () => {
 
 // Create blue icon for outsource operations - Google Maps style location pin (blue)
 const createBlueIcon = () => {
+  // Use a brighter, more distinct blue (#2563eb - blue-600) for better visibility
   return L.divIcon({
     className: 'outsource-operation-marker',
     html: `
@@ -150,14 +151,14 @@ const createBlueIcon = () => {
         ">
           <!-- Pin shadow -->
           <ellipse cx="20" cy="46" rx="8" ry="3" fill="rgba(0,0,0,0.2)"/>
-          <!-- Pin body - blue color -->
+          <!-- Pin body - bright blue color for outsource operations -->
           <path d="M20 0 C9 0 0 9 0 20 C0 30 20 50 20 50 C20 50 40 30 40 20 C40 9 31 0 20 0 Z" 
-                fill="#3b82f6" 
+                fill="#2563eb" 
                 stroke="#fff" 
                 stroke-width="2"/>
           <!-- Inner circle -->
           <circle cx="20" cy="20" r="8" fill="#fff"/>
-          <circle cx="20" cy="20" r="5" fill="#3b82f6"/>
+          <circle cx="20" cy="20" r="5" fill="#2563eb"/>
         </svg>
       </div>
     `,
@@ -297,11 +298,11 @@ const OperationMarker = memo(function OperationMarker({
   
   // Debug log to verify icon is being used
   if (type === 'outsource') {
-    console.log(`[OperationMarker] Creating ${operationType} operation marker with blue icon for operation ${operation.id}`);
+    console.log(`[OperationMarker] Creating ${operationType} operation marker with blue icon for operation ${operation.id}, icon class: ${icon.options.className}`);
   }
   
   return (
-    <Marker position={position} icon={icon}>
+    <Marker position={position} icon={icon} key={`${type}-${operation.id}-${position[0]}-${position[1]}`}>
       <Popup>
         <div>
           <strong>{operationType} Operation</strong>
