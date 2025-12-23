@@ -168,10 +168,46 @@ const createBlueIcon = () => {
   });
 };
 
+// Create gray icon for working sites - Google Maps style location pin (gray)
+const createGrayIcon = () => {
+  return L.divIcon({
+    className: 'working-site-marker',
+    html: `
+      <div style="
+        position: relative;
+        width: 0;
+        height: 0;
+      ">
+        <svg width="40" height="50" viewBox="0 0 40 50" style="
+          position: absolute;
+          left: -20px;
+          top: -50px;
+          filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        ">
+          <!-- Pin shadow -->
+          <ellipse cx="20" cy="46" rx="8" ry="3" fill="rgba(0,0,0,0.2)"/>
+          <!-- Pin body - gray color for working sites -->
+          <path d="M20 0 C9 0 0 9 0 20 C0 30 20 50 20 50 C20 50 40 30 40 20 C40 9 31 0 20 0 Z" 
+                fill="#6b7280" 
+                stroke="#fff" 
+                stroke-width="2"/>
+          <!-- Inner circle -->
+          <circle cx="20" cy="20" r="8" fill="#fff"/>
+          <circle cx="20" cy="20" r="5" fill="#6b7280"/>
+        </svg>
+      </div>
+    `,
+    iconSize: [40, 50],
+    iconAnchor: [20, 50], // Anchor at the bottom tip of the pin
+    popupAnchor: [0, -50],
+  });
+};
+
 // Pre-create icons for better performance
 const redIcon = createRedIcon(); // Red Google Maps style pin for internal operations
 const blueIcon = createBlueIcon(); // Blue Google Maps style pin for outsource operations
 const idleIcon = createIdleIcon(); // Orange Google Maps style pin for idle machinery
+const grayIcon = createGrayIcon(); // Gray Google Maps style pin for working sites
 
 // Offset markers at the same location using spiral pattern
 // This creates a tight cluster with markers evenly distributed in a spiral
@@ -425,6 +461,41 @@ const IdleMachineryMarker = memo(function IdleMachineryMarker({
   );
 });
 
+// Create gray icon for working sites - Google Maps style location pin (gray)
+const createGrayIcon = () => {
+  return L.divIcon({
+    className: 'working-site-marker',
+    html: `
+      <div style="
+        position: relative;
+        width: 0;
+        height: 0;
+      ">
+        <svg width="40" height="50" viewBox="0 0 40 50" style="
+          position: absolute;
+          left: -20px;
+          top: -50px;
+          filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        ">
+          <!-- Pin shadow -->
+          <ellipse cx="20" cy="46" rx="8" ry="3" fill="rgba(0,0,0,0.2)"/>
+          <!-- Pin body - gray color for working sites -->
+          <path d="M20 0 C9 0 0 9 0 20 C0 30 20 50 20 50 C20 50 40 30 40 20 C40 9 31 0 20 0 Z" 
+                fill="#6b7280" 
+                stroke="#fff" 
+                stroke-width="2"/>
+          <!-- Inner circle -->
+          <circle cx="20" cy="20" r="8" fill="#fff"/>
+          <circle cx="20" cy="20" r="5" fill="#6b7280"/>
+        </svg>
+      </div>
+    `,
+    iconSize: [40, 50],
+    iconAnchor: [20, 50], // Anchor at the bottom tip of the pin
+    popupAnchor: [0, -50],
+  });
+};
+
 // Working site marker component - memoized for stability
 const WorkingSiteMarker = memo(function WorkingSiteMarker({
   site,
@@ -451,7 +522,7 @@ const WorkingSiteMarker = memo(function WorkingSiteMarker({
   }, [site.location, site.latitude, site.longitude]);
   
   return (
-    <Marker position={coords} icon={DefaultIcon}>
+    <Marker position={coords} icon={grayIcon}>
       <Popup>
         <div>
           <strong>{site.workingSiteName}</strong>
@@ -1046,8 +1117,14 @@ export function MachineryMap({
                 )}
                 {outsourceOps.length > 0 && (
                   <div className={styles.legendItem}>
-                    <div className={styles.legendColor} style={{ backgroundColor: '#3b82f6' }}></div>
+                    <div className={styles.legendColor} style={{ backgroundColor: '#2563eb' }}></div>
                     <span>Outsource Operations</span>
+                  </div>
+                )}
+                {workingSites.length > 0 && (
+                  <div className={styles.legendItem}>
+                    <div className={styles.legendColor} style={{ backgroundColor: '#6b7280' }}></div>
+                    <span>Working Sites</span>
                   </div>
                 )}
               </>
