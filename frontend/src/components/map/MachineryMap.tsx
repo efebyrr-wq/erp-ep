@@ -870,30 +870,30 @@ function MapMarkers({
     return markers;
   }, [activeMachinery, filteredInternalOps, filteredOutsourceOps, workingSites, filterWorkingSiteName]);
   
-  // Create working site markers - filter by search query if provided
-  const siteMarkers = useMemo(() => {
-    let sitesToShow = workingSites;
-    if (filterWorkingSiteName) {
-      const filterLower = filterWorkingSiteName.toLowerCase();
-      sitesToShow = workingSites.filter(site =>
-        site.workingSiteName.toLowerCase().includes(filterLower)
-      );
-    }
-    return sitesToShow.map((site) => {
-      // Ensure site has coordinates or can parse location
-      const hasCoords = (site.latitude && site.longitude) || parseLocation(site.location || '');
-      if (!hasCoords) {
-        console.warn(`[MapMarkers] Working site "${site.workingSiteName}" has no coordinates and location cannot be parsed`);
-      }
-      return <WorkingSiteMarker key={`site-${site.id}`} site={site} />;
-    });
-  }, [workingSites, filterWorkingSiteName]);
+  // Working site markers are hidden - only show operations and machinery
+  // const siteMarkers = useMemo(() => {
+  //   let sitesToShow = workingSites;
+  //   if (filterWorkingSiteName) {
+  //     const filterLower = filterWorkingSiteName.toLowerCase();
+  //     sitesToShow = workingSites.filter(site =>
+  //       site.workingSiteName.toLowerCase().includes(filterLower)
+  //     );
+  //   }
+  //   return sitesToShow.map((site) => {
+  //     // Ensure site has coordinates or can parse location
+  //     const hasCoords = (site.latitude && site.longitude) || parseLocation(site.location || '');
+  //     if (!hasCoords) {
+  //       console.warn(`[MapMarkers] Working site "${site.workingSiteName}" has no coordinates and location cannot be parsed`);
+  //     }
+  //     return <WorkingSiteMarker key={`site-${site.id}`} site={site} />;
+  //   });
+  // }, [workingSites, filterWorkingSiteName]);
   
   return (
     <>
       {operationMarkers}
       {machineryMarkers}
-      {siteMarkers}
+      {/* Working site markers hidden per user request */}
     </>
   );
 }
