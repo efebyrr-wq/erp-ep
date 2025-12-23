@@ -295,6 +295,11 @@ const OperationMarker = memo(function OperationMarker({
   const machineNumber = 'machineNumber' in operation ? operation.machineNumber : null;
   const machineCode = 'machineCode' in operation ? operation.machineCode : null;
   
+  // Debug log to verify icon is being used
+  if (type === 'outsource') {
+    console.log(`[OperationMarker] Creating ${operationType} operation marker with blue icon for operation ${operation.id}`);
+  }
+  
   return (
     <Marker position={position} icon={icon}>
       <Popup>
